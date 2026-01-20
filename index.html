@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biosphere 2 | Science at Planetary Scale</title>
+    
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- CHARTS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="main-nav">
+        <div class="nav-left">
+            <a href="#" class="brand-logo">BIOSPHERE<span class="highlight">2</span></a>
+        </div>
+        <div class="nav-right">
+            <a href="https://www.biosphere2.org/visit/visit-biosphere-2" class="nav-item btn-solid">VISIT</a>
+            <a href="https://www.biosphere2.org/research/research-initiatives" class="nav-item btn-solid">RESEARCH</a>
+            <a href="#systems" class="nav-item highlight-btn">DATA</a>
+        </div>
+    </nav>
+
+    <!-- 1. HERO SECTION -->
+    <header class="hero-section">
+        <div class="hero-bg">
+            <!-- VIDEO BACKGROUND INTEGRATION -->
+            <iframe 
+                src="https://www.youtube.com/embed/NKHTdY6U9p4?autoplay=1&mute=1&controls=0&loop=1&playlist=NKHTdY6U9p4&showinfo=0&rel=0&iv_load_policy=3" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;"
+                allowfullscreen>
+            </iframe>
+            <div class="hero-overlay"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-status">SYSTEM STATUS: <span class="blink">OPERATIONAL</span></div>
+            <!-- UPDATED HEADLINE OPTION -->
+            <h1 class="hero-title">SCIENCE AT<br>PLANETARY SCALE.</h1>
+            
+            <div class="hero-stats-row">
+                <div class="stat-box">
+                    <span class="stat-num">3.14</span>
+                    <span class="stat-lbl">ACRES LAB</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num">07</span>
+                    <span class="stat-lbl">BIOMES</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num">611</span>
+                    <span class="stat-lbl">SENSORS</span>
+                </div>
+            </div>
+
+            <div class="hero-cards-container">
+                <a href="https://www.biosphere2.org/visit/visit-biosphere-2" class="hero-card">
+                    <span class="card-label">01 // EXPERIENCE</span>
+                    <h3>PLAN YOUR VISIT</h3>
+                </a>
+                <a href="https://www.biosphere2.org/research/research-initiatives" class="hero-card">
+                    <span class="card-label">02 // DISCOVER</span>
+                    <h3>RESEARCH INITIATIVES</h3>
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-scroll-indicator">
+            <span>SCROLL TO EXPLORE</span>
+            <div class="arrow-down">↓</div>
+        </div>
+    </header>
+
+    <!-- 2. RESEARCH CATEGORIES -->
+    <section class="services-3col">
+        <!-- Column 1 -->
+        <a href="https://www.biosphere2.org/research/research-initiatives" class="service-col" style="background-image: url('https://biosphere2.org/sites/default/files/styles/az_card_image/public/2025-07/P1013152.jpg.webp?itok=SES4gTVn');">
+            <div class="col-overlay"></div>
+            <div class="col-content">
+                <h2 class="col-title">Planetary Resilience</h2>
+                <p>Understanding how ecosystems adapt to climate change through controlled large-scale experimentation.</p>
+                <span class="read-more-btn">Read More <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+        </a>
+
+        <!-- Column 2 -->
+        <a href="https://www.biosphere2.org/research/space-analogues" class="service-col" style="background-image: url('https://biosphere2.org/sites/default/files/styles/az_card_image/public/2021-10/2_Introduction_Educational%20Programs%20%281%29.JPG.webp?itok=rluYadvR');">
+            <div class="col-overlay"></div>
+            <div class="col-content">
+                <h2 class="col-title">Space Analogues</h2>
+                <p>Developing bioregenerative life support systems for the Moon, Mars, and beyond.</p>
+                <span class="read-more-btn">Read More <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+        </a>
+
+        <!-- Column 3 -->
+        <a href="https://www.biosphere2.org/research/agrivoltaics" class="service-col" style="background-image: url('https://biosphere2.org/sites/default/files/styles/az_card_image/public/2025-10/Screenshot-2025-10-06-at-10.48.04-AM.png.webp?itok=3sRsR6Zy');">
+            <div class="col-overlay"></div>
+            <div class="col-content">
+                <h2 class="col-title">Agrivoltaics & Food</h2>
+                <p>Revolutionizing food security by combining renewable energy generation with agriculture.</p>
+                <span class="read-more-btn">Read More <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+        </a>
+    </section>
+
+    <!-- 3. PARTNERS TICKER -->
+    <section class="partners-ticker">
+        <div class="ticker-track">
+            <a href="#" class="partner-logo">UNIVERSITY OF ARIZONA</a>
+            <a href="#" class="partner-logo">NASA</a>
+            <a href="#" class="partner-logo">NSF</a>
+            <a href="#" class="partner-logo">SAM</a>
+            <a href="#" class="partner-logo">LEO</a>
+            <a href="#" class="partner-logo">KAUST</a>
+            <a href="#" class="partner-logo">UNIVERSITY OF ARIZONA</a>
+            <a href="#" class="partner-logo">NASA</a>
+            <a href="#" class="partner-logo">NSF</a>
+            <a href="#" class="partner-logo">SAM</a>
+            <a href="#" class="partner-logo">LEO</a>
+            <a href="#" class="partner-logo">KAUST</a>
+        </div>
+    </section>
+
+    <!-- 4. STICKY PRODUCT SHOWCASE (UPDATED WITH ALL BIOMES) -->
+    <section class="sticky-showcase" id="biomes">
+        <div class="sticky-wrapper">
+            
+            <!-- Scrolling Left Column (Images) -->
+            <div class="scrolling-visuals">
+                <!-- 1. Ocean -->
+                <a href="https://www.biosphere2.org/research/research-initiatives/ocean-reef-lab" class="visual-item">
+                    <div class="img-frame">
+                        <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2021-10/3_Biomes_Ocean_Photo_Option%203.jpg.webp?itok=Em1QPdlr" alt="Ocean">
+                    </div>
+                    <div class="tech-spec">
+                        <span>OCEAN REEF LAB</span>
+                        <span>1M GALLONS</span>
+                        <span>CORAL RESILIENCE</span>
+                    </div>
+                </a>
+
+                <!-- 2. Rainforest -->
+                <a href="https://www.biosphere2.org/research/research-initiatives/rainforest" class="visual-item">
+                    <div class="img-frame">
+                        <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1013127.jpg.webp?itok=Usjd2Ji1" alt="Rainforest">
+                    </div>
+                    <div class="tech-spec">
+                        <span>TROPICAL RAINFOREST</span>
+                        <span>90+ SPECIES</span>
+                        <span>CARBON CYCLING</span>
+                    </div>
+                </a>
+
+                <!-- 3. Savannah -->
+                <a href="https://www.biosphere2.org/research/research-initiatives/savannah" class="visual-item">
+                    <div class="img-frame">
+                        <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1014166.jpg.webp?itok=R_Mn7Q3o" alt="Savannah">
+                    </div>
+                    <div class="tech-spec">
+                        <span>HYDROLOGICAL SAVANNAH</span>
+                        <span>TRANSITION ZONE</span>
+                        <span>SOIL EROSION</span>
+                    </div>
+                </a>
+
+                <!-- 4. Mangroves (ADDED FROM RAW HTML) -->
+                <a href="#" class="visual-item">
+                    <div class="img-frame">
+                        <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1013853.jpg.webp?itok=Cw9eZ_Mm" alt="Mangroves">
+                    </div>
+                    <div class="tech-spec">
+                        <span>MANGROVES</span>
+                        <span>WETLAND RESTORATION</span>
+                        <span>TROPICAL MARSH</span>
+                    </div>
+                </a>
+
+                <!-- 5. Desert -->
+                <a href="https://www.biosphere2.org/research/research-initiatives/fog-desert" class="visual-item">
+                    <div class="img-frame">
+                        <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1014207.jpg.webp?h=16a8947f&itok=mcMX179_" alt="Desert">
+                    </div>
+                    <div class="tech-spec">
+                        <span>COASTAL FOG DESERT</span>
+                        <span>ARID CLIMATE</span>
+                        <span>PLANT PHYSIOLOGY</span>
+                    </div>
+                </a>
+
+                <!-- 6. LEO -->
+                <a href="https://leo.b2science.org/" class="visual-item">
+                    <div class="img-frame">
+                        <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/MecklerPhoto-LEO_0597_F.jpg.webp?h=5ba7cdad&itok=jp3zIEof" alt="LEO">
+                    </div>
+                    <div class="tech-spec">
+                        <span>LEO</span>
+                        <span>EVOLUTION OBS.</span>
+                        <span>BASALT HILLSLOPES</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Sticky Right Column (Text) -->
+            <div class="sticky-content">
+                <div class="content-lock">
+                    <span class="section-label">THE SYSTEMS</span>
+                    <h2 class="display-heading">Active<br>Biomes.</h2>
+                    <p class="body-text">
+                        Explore a 3.14-acre living laboratory where cutting-edge research unfolds across diverse ecosystems—including a rainforest, ocean, mangrove, desert, and the Landscape Evolution Observatory. Unlike in the natural world, scientists at Biosphere 2 can precisely control and isolate environmental variables, allowing them to study interactions that are impossible to separate in nature.
+                    </p>
+                    <a href="https://www.biosphere2.org/research/biosphere-2-systems" class="btn-underline">DISCOVER THE LAB</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 5. LIVE SYSTEM INTELLIGENCE -->
+    <section id="systems" class="section-padding bg-light-theme">
+        <div class="integrated-container">
+            <div class="dashboard-header">
+                <h2 class="display-heading text-dark" style="font-size: 3rem;">Live Intelligence</h2>
+                <div class="system-tabs">
+                    <button class="tab-btn active" onclick="switchSystem('ocean', this)">OCEAN</button>
+                    <button class="tab-btn" onclick="switchSystem('rainforest', this)">RAINFOREST</button>
+                    <button class="tab-btn" onclick="switchSystem('mangroves', this)">MANGROVES</button>
+                    <button class="tab-btn" onclick="switchSystem('savannah', this)">SAVANNAH</button>
+                    <button class="tab-btn" onclick="switchSystem('desert', this)">DESERT</button>
+                    <button class="tab-btn" onclick="switchSystem('leo', this)">LEO</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-visual">
+                    <img id="system-image" src="" alt="System Visual">
+                    <div class="visual-overlay-gradient"></div>
+                </div>
+                
+                <div class="dashboard-data" id="panel-container">
+                    <div class="panel-overlay" id="loading-overlay"><div class="spinner"></div></div>
+                    
+                    <div class="data-header">
+                        <h3 id="system-title">System Name</h3>
+                        <span id="last-update">Updated: --</span>
+                    </div>
+
+                    <!-- NEW LAYOUT: CONTENT WRAPPER -->
+                    <div class="data-content-wrapper">
+                        <!-- Left Side: Text Info -->
+                        <div class="data-left-col">
+                            <p id="system-blurb">System description loading...</p>
+                            <div id="system-finding-box" class="finding-box" style="display:none;">
+                                <strong>Significant Research Finding:</strong> <span id="system-finding"></span>
+                            </div>
+                            <div class="dashboard-footer">
+                                <a href="#" id="system-link" class="btn-secondary-circle">
+                                    More Insights <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Metrics & Chart -->
+                        <div class="data-right-col">
+                            <div class="metrics-grid" id="data-grid">
+                                <!-- Bubbles injected via JS -->
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-controls">
+                                    <span>Trend Analysis</span>
+                                    <div class="pill-toggle">
+                                        <button class="toggle-opt active" onclick="toggleTimeRange('24h', this)">24H</button>
+                                        <button class="toggle-opt" onclick="toggleTimeRange('7d', this)">7D</button>
+                                    </div>
+                                </div>
+                                <div class="chart-canvas-wrapper">
+                                    <canvas id="systemChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. CALENDAR & EXPERTISE -->
+    <section class="events-tech-wrapper">
+        <!-- Events Component -->
+        <div class="events-section">
+            <div class="integrated-container events-grid">
+                <div class="events-info">
+                    <span class="section-label">COMMUNITY</span>
+                    <h2 class="display-heading text-dark" style="font-size: 2.5rem;">Upcoming<br>Events.</h2>
+                    <a href="#" class="ghost-btn-dark">All Events</a>
+                </div>
+                <div class="calendar-wrapper">
+                    <div class="cal-header">
+                        <span>January 2026</span>
+                        <div class="cal-nav">
+                            <i class="fas fa-chevron-left"></i>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <table class="cal-table">
+                        <thead>
+                            <tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="mute">29</td><td class="mute">30</td><td class="mute">31</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+                            <tr><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td></tr>
+                            <tr><td>12</td><td>13</td><td>14</td><td>15</td><td class="today">16</td><td>17</td><td>18</td></tr>
+                            <tr><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td></tr>
+                            <tr><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td class="mute">1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Expertise Component -->
+        <div class="skills-section">
+            <div class="integrated-container">
+                <span class="section-label" style="justify-content: center; color: var(--ua-sky);">CAPABILITIES</span>
+                <h2 class="display-heading text-white text-center" style="font-size: 2.5rem; margin-bottom: 2rem;">Scientific Capabilities.</h2>
+                
+                <div class="skills-tabs">
+                    <button class="skill-tab-btn active" onclick="openSkillTab('leo')">LEO (Hydrology)</button>
+                    <button class="skill-tab-btn" onclick="openSkillTab('ocean')">Ocean Lab</button>
+                    <button class="skill-tab-btn" onclick="openSkillTab('agri')">Agrivoltaics</button>
+                    <button class="skill-tab-btn" onclick="openSkillTab('rain')">Rainforest (WALD)</button>
+                </div>
+
+                <div class="skills-split-layout">
+                    <!-- Left: Description Content -->
+                    <div class="skills-text-content" id="skill-text">
+                        <h3 class="skill-heading">Landscape Evolution (LEO)</h3>
+                        <p class="skill-desc">
+                            The Landscape Evolution Observatory (LEO) is the world's largest controlled experiment on watershed hydrology. Three massive hillslopes filled with crushed basalt allow scientists to track every drop of water and trace how life shapes physical landscapes.
+                        </p>
+                        <div class="skill-meta">
+                            <span class="meta-label">KEY RESEARCH:</span>
+                            <span class="meta-val">Subsurface water flow, Basalt weathering, Carbon sequestration.</span>
+                            <span class="meta-label">LEAD EXPERTISE:</span>
+                            <span class="meta-val">Dr. Peter Troch, Dr. Luke Pangle</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Visuals/Bars -->
+                    <div class="skills-visuals" id="skill-bars">
+                        <div class="skill-row">
+                            <span class="skill-name">Sensor Density (2000+ per slope)</span>
+                            <div class="progress-track"><div class="progress-bar" style="width: 98%;"></div></div>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-name">Controlled Precipitation Precision</span>
+                            <div class="progress-track"><div class="progress-bar" style="width: 95%;"></div></div>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-name">Subsurface Imaging</span>
+                            <div class="progress-track"><div class="progress-bar" style="width: 85%;"></div></div>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-name">Data Granularity</span>
+                            <div class="progress-track"><div class="progress-bar" style="width: 92%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FEATURED & SUCCESS STORIES (UPDATED CONTENT) -->
+    <section class="section-padding bg-warm-grey">
+        <div class="integrated-container">
+            <h2 class="display-heading text-dark" style="font-size: 3rem; margin-bottom: 2rem;">Recently Featured</h2>
+            
+            <div class="slider-track">
+                <!-- Card 1: Life Emergence -->
+                <a href="https://theconversation.com/biosphere-2s-latest-mission-learning-how-life-first-emerged-on-earth-and-how-to-make-barren-worlds-habitable-262293" class="slider-card">
+                    <div class="card-logo">THE CONVERSATION</div>
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_card_image/public/2025-10/Screenshot-2025-10-06-at-10.48.04-AM.png.webp?itok=3sRsR6Zy" alt="Life Emergence">
+                    <h4>Life's First Emergence: Making barren worlds habitable.</h4>
+                </a>
+                
+                <!-- Card 2: Research -->
+                <a href="https://www.biosphere2.org/research/research-initiatives" class="slider-card">
+                    <div class="card-logo">RESEARCH</div>
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_card_image/public/2025-07/P1013152.jpg.webp?itok=SES4gTVn" alt="Research">
+                    <h4>World-class research in sustainability and ecosystem conservation.</h4>
+                </a>
+
+                <!-- Card 3: Education -->
+                 <a href="https://www.biosphere2.org/education/education-and-broader-impacts" class="slider-card">
+                    <div class="card-logo">EDUCATION</div>
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_card_image/public/2021-10/2_Introduction_Educational%20Programs%20%281%29.JPG.webp?itok=rluYadvR" alt="Education">
+                    <h4>K-12 Programs inspiring the next generation.</h4>
+                </a>
+
+                <!-- Card 4: Partners -->
+                <a href="https://live-azs-biosphere2.pantheonsite.io/research/research-initiatives/partnerships/biosphere-2-partners" class="slider-card">
+                    <div class="card-logo">PARTNERS</div>
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_card_image/public/2025-07/Affiliates-cover-image_0.jpg.webp?h=c36a5614&itok=RumNtCtS" alt="Partners">
+                    <h4>Collaboration opportunities for UA and partners.</h4>
+                </a>
+            </div>
+            
+            <div class="slider-controls">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. FIND US & CTA -->
+    <section class="find-us-section">
+        <div class="find-us-grid">
+            <!-- Left: Standard Grayscale Map -->
+            <div class="find-us-map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3388.985955639536!2d-110.8529326848419!3d32.57864398103328!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86d67b70f031021b%3A0x633125e90a612509!2sBiosphere%202!5e0!3m2!1sen!2sus!4v1655123456789!5m2!1sen!2sus" width="100%" height="100%" style="border:0; filter: grayscale(100%);" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+            
+            <!-- Right: Info & CTA (Combined) -->
+            <div class="find-us-info">
+                <div class="f-header">
+                    <span class="section-label">LOCATION & VISITING</span>
+                    <h2 class="display-heading text-dark" style="font-size: 2.5rem;">Visit<br>Headquarters.</h2>
+                </div>
+                
+                <div class="location-details">
+                    <address class="f-address">
+                        <strong>Biosphere 2</strong><br>
+                        32540 S Biosphere Rd<br>
+                        Oracle, AZ 85623<br>
+                        520-621-4800
+                    </address>
+                    <div class="f-hours">
+                        <strong>Open Daily</strong><br>
+                        9:00am - 4:00pm<br>
+                        <span style="font-size:0.8em; color:#666;">Excluding Thanksgiving & Christmas</span>
+                    </div>
+                </div>
+
+                <div class="cta-integration">
+                    <h4 class="cta-mini-head">Ready to experience it?</h4>
+                    <p class="cta-mini-text">Download the App to guide your tour or purchase general admission tickets online.</p>
+                    <div class="f-buttons">
+                        <a href="https://www.biosphere2.org/visit/visit-biosphere-2" class="ghost-btn-dark">PLAN YOUR VISIT</a>
+                        <a href="https://www.biosphere2.org/contact" class="link-simple">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. FOOTER -->
+    <footer class="main-footer">
+        <div class="footer-grid">
+            
+            <div class="footer-col newsletter-col">
+                <h4>SUBSCRIBE</h4>
+                <p>Get our "Inside the Impact" e-newsletter delivered to your inbox every month.</p>
+                <form class="footer-form">
+                    <input type="email" placeholder="Email Address">
+                    <button type="submit">SUBMIT</button>
+                </form>
+            </div>
+
+            <div class="footer-col">
+                <h4>BIOMES</h4>
+                <ul>
+                    <li><a href="#" onclick="switchSystem('rainforest', document.querySelector('.tab-btn:nth-child(2)')); location.href='#systems'; return false;">Rainforest</a></li>
+                    <li><a href="#" onclick="switchSystem('ocean', document.querySelector('.tab-btn:nth-child(1)')); location.href='#systems'; return false;">Ocean</a></li>
+                    <li><a href="#" onclick="switchSystem('savannah', document.querySelector('.tab-btn:nth-child(3)')); location.href='#systems'; return false;">Savannah</a></li>
+                    <li><a href="#" onclick="switchSystem('desert', document.querySelector('.tab-btn:nth-child(4)')); location.href='#systems'; return false;">Desert</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>INFO</h4>
+                <ul>
+                    <li><a href="https://www.biosphere2.org/about">About Us</a></li>
+                    <li><a href="https://www.biosphere2.org/visit">History</a></li>
+                    <li><a href="https://www.biosphere2.org/visit/visit-biosphere-2/self-guided-tour">Tours</a></li>
+                    <li><a href="http://115199.blackbaudhosting.com/115199/tickets">Tickets</a></li>
+                    <li><a href="/directory">Directory</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>CONNECT</h4>
+                <ul>
+                    <li><a href="https://www.instagram.com/biosphere2/">Instagram</a></li>
+                    <li><a href="https://www.facebook.com/Biosphere2">Facebook</a></li>
+                    <li><a href="https://www.youtube.com/channel/UCMuD0y0Uz0AFRQMq1C_uWcw">YouTube</a></li>
+                    <li><a href="https://www.tiktok.com/@biosphere2">TikTok</a></li>
+                </ul>
+            </div>
+
+        </div>
+        
+        <div class="footer-bottom">
+            <span>© 2026 The Arizona Board of Regents on behalf of The University of Arizona.</span>
+            <span>Land Acknowledgment: Tohono O’odham and Yaqui.</span>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT (UPDATED WITH RAW CONTENT DATA) -->
+    <script>
+        const PROXY_URL = 'https://corsproxy.io/?';
+        const TARGET_URL = 'https://data.b2.arizona.edu/Bio2Controls/TimeSeries.jsp?tab=';
+
+        let currentSystem = null; 
+        let currentSystemData = []; 
+        let selectedSensorIndex = 0; 
+        let timeRange = '24h'; 
+        let myChart = null;
+
+        // Data for Skills Section
+        const skillData = {
+            leo: {
+                title: "Landscape Evolution (LEO)",
+                desc: "The Landscape Evolution Observatory (LEO) is the world's largest controlled experiment on watershed hydrology. Three massive hillslopes filled with crushed basalt allow scientists to track every drop of water and trace how life shapes physical landscapes.",
+                meta: {
+                    research: "Subsurface water flow, Basalt weathering, Carbon sequestration.",
+                    lead: "Dr. Peter Troch, Dr. Luke Pangle"
+                },
+                bars: [
+                    { label: "Sensor Density (2000+ per slope)", width: "98%" },
+                    { label: "Controlled Precipitation Precision", width: "95%" },
+                    { label: "Subsurface Imaging", width: "85%" },
+                    { label: "Data Granularity", width: "92%" }
+                ]
+            },
+            ocean: {
+                title: "Ocean Reef Lab",
+                desc: "A fully enclosed Caribbean coral reef mesocosm. Unlike open ocean studies, this 1-million-gallon tank allows researchers to manipulate water chemistry and temperature to test coral resilience against future climate scenarios.",
+                meta: {
+                    research: "Coral bleaching recovery, Calcification rates, Algae remediation.",
+                    lead: "Dr. Diane Thompson"
+                },
+                bars: [
+                    { label: "Water Chemistry Control", width: "90%" },
+                    { label: "Thermal Regulation Speed", width: "80%" },
+                    { label: "Species Diversity (Caribbean)", width: "70%" },
+                    { label: "Historical Data Archive", width: "95%" }
+                ]
+            },
+            agri: {
+                title: "Agrivoltaics",
+                desc: "Biosphere 2 is a global leader in Agrivoltaics—co-locating agriculture and solar photovoltaics. Research demonstrates that shading crops with solar panels reduces water usage, increases panel efficiency, and protects plants from extreme heat.",
+                meta: {
+                    research: "Food-Water-Energy Nexus, Crop yield under shade.",
+                    lead: "Dr. Greg Barron-Gafford"
+                },
+                bars: [
+                    { label: "Water Efficiency Gain", width: "95%" },
+                    { label: "PV Efficiency Boost", width: "85%" },
+                    { label: "Scalability Potential", width: "90%" },
+                    { label: "Microclimate Cooling", width: "88%" }
+                ]
+            },
+            rain: {
+                title: "Tropical Rainforest (WALD)",
+                desc: "The Water, Atmosphere, and Life Dynamics (WALD) campaign utilized the enclosed rainforest to trace carbon and water isotopes through the ecosystem. This research helps predict how tropical forests will react to severe drought.",
+                meta: {
+                    research: "Isotopic tracing, VOC emissions, Drought response.",
+                    lead: "Dr. Laura Meredith, Dr. Joost van Haren"
+                },
+                bars: [
+                    { label: "Atmospheric Closure", width: "99%" },
+                    { label: "Isotope Tracing Capability", width: "95%" },
+                    { label: "Canopy Access", width: "80%" },
+                    { label: "Ecosystem Complexity", width: "90%" }
+                ]
+            }
+        };
+
+        const systems = {
+            ocean: {
+                title: "Ocean Reef Lab",
+                blurb: "Modeling a Caribbean reef ecosystem to understand resilience in warming oceans. We’ve gone headfirst into revitalizing our ocean system to be a premier research space for coral reef restoration.",
+                finding: "Demonstrated how, under current atmospheric CO₂ levels, changes in ocean chemistry significantly slow coral growth.",
+                image: "https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2021-10/3_Biomes_Ocean_Photo_Option%203.jpg.webp?itok=Em1QPdlr",
+                link: "https://www.biosphere2.org/research/research-initiatives/ocean-reef-lab",
+                color: "#7F00FF", 
+                sensors: [
+                    { id: "463", label: "Water Temp", unit: "°C" },
+                    { id: "469", label: "Dissolved O2", unit: "mg/L" },
+                    { id: "457", label: "pH Level", unit: "pH" },
+                    { id: "467", label: "Salinity", unit: "PSU" }
+                ]
+            },
+            rainforest: {
+                title: "Tropical Rainforest",
+                blurb: "We know that rain forest plants have a lot to tell us about the world’s ecosystem. We use this system to listen carefully and inform integral changes to adapt to climate change.",
+                finding: "Tropical plants stop absorbing more carbon dioxide from the air once levels reach about 600 parts per million—a threshold we’re on track to hit by 2050.",
+                image: "https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1013127.jpg.webp?itok=Usjd2Ji1",
+                link: "https://www.biosphere2.org/research/research-initiatives/tropical-rain-forest",
+                color: "#00C853", 
+                sensors: [
+                    { id: "562", label: "Mtn Temp", unit: "°F" },
+                    { id: "561", label: "Humidity", unit: "%" },
+                    { id: "567", label: "CO2", unit: "ppm" },
+                    { id: "546", label: "Pond Temp", unit: "°F" }
+                ]
+            },
+            savannah: {
+                title: "Hydrological Savannah",
+                blurb: "History of how this system served as a hydrological transition zone designed to balance atmospheric chemistry between two uniquely different environments: the desert and the rain forest.",
+                finding: null,
+                image: "https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1014166.jpg.webp?itok=R_Mn7Q3o",
+                link: "#",
+                color: "#FFAB00",
+                sensors: [
+                    { id: "535", label: "Lower Temp", unit: "°F" },
+                    { id: "538", label: "Humidity", unit: "%" },
+                    { id: "543", label: "Base CO2", unit: "ppm" },
+                    { id: "832", label: "Scrub Temp", unit: "°F" }
+                ]
+            },
+            desert: {
+                title: "Coastal Fog Desert",
+                blurb: "Designed to simulate an arid desert scrub ecosystem. Studies of insect behavior and desert plant physiology under elevated CO₂ highlighted ecosystem-level responses in marginal environments.",
+                finding: "CAM plant systems failed to recapture CO₂ lost via soil respiration after drought, suggesting limits to arid ecosystem carbon recovery.",
+                image: "https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1014207.jpg.webp?h=16a8947f&itok=mcMX179_",
+                link: "#",
+                color: "#D500F9",
+                sensors: [
+                    { id: "1157", label: "Air Temp", unit: "°F" },
+                    { id: "1158", label: "Humidity", unit: "%" },
+                    { id: "1164", label: "Air Flow", unit: "" },
+                    { id: "1155", label: "Supply Temp", unit: "°F" }
+                ]
+            },
+            mangroves: {
+                title: "Mangroves",
+                blurb: "Take a trip to the tropics with our mangroves. This system allows us to look closely at two key types of wetlands and put plans to action for restoring these systems in the wild.",
+                finding: null,
+                image: "https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/P1013853.jpg.webp?itok=Cw9eZ_Mm",
+                link: "#",
+                color: "#2E7D32", // Mangrove Green
+                // Reusing Ocean sensors as placeholders for Mangroves if specific IDs not available
+                sensors: [
+                    { id: "463", label: "Water Temp", unit: "°C" },
+                    { id: "469", label: "Dissolved O2", unit: "mg/L" },
+                    { id: "561", label: "Humidity", unit: "%" },
+                    { id: "467", label: "Salinity", unit: "PSU" }
+                ]
+            },
+            leo: {
+                title: "Landscape Evolution",
+                blurb: "Tracking every drop of water to understand how landscapes evolve. LEO consists of three massive hillslopes filled with crushed basalt.",
+                finding: "The project explores how increasing complexity in the landscape—such as vegetation growth—affects water flow and quality.",
+                image: "https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2025-07/MecklerPhoto-LEO_0597_F.jpg.webp?h=5ba7cdad&itok=jp3zIEof",
+                link: "https://www.biosphere2.org/research/research-initiatives/landscape-evolution-observatory-leo",
+                color: "#2962FF",
+                sensors: [
+                    { id: "19362", label: "West Temp", unit: "°F" },
+                    { id: "19361", label: "Airflow", unit: "cfm" },
+                    { id: "616", label: "Base CO2", unit: "ppm" },
+                    { id: "578", label: "Humidity", unit: "%" }
+                ]
+            }
+        };
+
+        async function fetchSensorData(id) {
+            try {
+                const encodedUrl = encodeURIComponent(`${TARGET_URL}${id}`);
+                const response = await fetch(`${PROXY_URL}${encodedUrl}`);
+                const text = await response.text();
+                const match = text.match(/window\.chart1_chartModel\s*=\s*({[\s\S]*?});/);
+                if (!match) return null;
+                const raw = JSON.parse(match[1]);
+                const data = raw.layers[0].dataSets[0].data;
+                const times = raw.layers[0].xValues;
+                const offset = 62135596800;
+                let cleanData = [];
+                let lastVal = "--";
+                for(let i=0; i<data.length; i++) {
+                    if(data[i] !== null && Math.abs(data[i]) > 0.01) {
+                        lastVal = data[i];
+                        cleanData.push({ x: (times[i] - offset) * 1000, y: data[i] });
+                    }
+                }
+                return { current: lastVal, history: cleanData };
+            } catch (e) { console.error(e); return null; }
+        }
+
+        async function switchSystem(key, btnElement) {
+            if (key === currentSystem && btnElement.classList.contains('active')) return;
+            currentSystem = key;
+            selectedSensorIndex = 0;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+            
+            const sys = systems[key];
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('active');
+
+            document.getElementById('system-title').textContent = sys.title;
+            document.getElementById('system-blurb').textContent = sys.blurb;
+            
+            // Logic for Significant Finding
+            const findingBox = document.getElementById('system-finding-box');
+            if(sys.finding) {
+                document.getElementById('system-finding').textContent = sys.finding;
+                findingBox.style.display = 'block';
+            } else {
+                findingBox.style.display = 'none';
+            }
+
+            document.getElementById('system-image').src = sys.image;
+            document.getElementById('panel-container').style.setProperty('--accent-color', sys.color);
+            document.getElementById('system-link').href = sys.link;
+
+            const promises = sys.sensors.map(s => fetchSensorData(s.id));
+            currentSystemData = await Promise.all(promises);
+
+            const now = new Date();
+            document.getElementById('last-update').textContent = "Updated: " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            renderBubbles();
+            updateChart();
+            setTimeout(() => overlay.classList.remove('active'), 300);
+        }
+
+        function renderBubbles() {
+            const sys = systems[currentSystem];
+            const grid = document.getElementById('data-grid');
+            grid.innerHTML = '';
+
+            sys.sensors.forEach((config, index) => {
+                const data = currentSystemData[index];
+                const value = data && data.current !== "--" ? data.current.toFixed(1) : "--";
+                const div = document.createElement('div');
+                div.className = `metric-card ${index === selectedSensorIndex ? 'active' : ''}`;
+                div.onclick = () => { selectedSensorIndex = index; renderBubbles(); updateChart(); };
+                div.innerHTML = `<span class="m-label">${config.label}</span><span class="m-val">${value} <small>${config.unit}</small></span>`;
+                grid.appendChild(div);
+            });
+        }
+
+        function updateChart() {
+            const sys = systems[currentSystem];
+            const dataObj = currentSystemData[selectedSensorIndex];
+            if (!dataObj || !dataObj.history.length) return;
+
+            const latestTime = dataObj.history[dataObj.history.length - 1].x;
+            const cutoff = timeRange === '24h' ? latestTime - 86400000 : latestTime - 604800000;
+            const filtered = dataObj.history.filter(pt => pt.x > cutoff);
+
+            const ctx = document.getElementById('systemChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, sys.color); 
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+            Chart.defaults.font.family = 'Inter';
+            Chart.defaults.color = '#555';
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: filtered,
+                        borderColor: sys.color,
+                        backgroundColor: gradient,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: {display: false} },
+                    scales: {
+                        x: { 
+                            type: 'time', 
+                            grid: {display: false}, 
+                            ticks: {font: {size: 11}, color: '#888'} 
+                        },
+                        y: { 
+                            grid: {color:'#eaeaea'}, 
+                            ticks: {font: {size: 11}, color: '#888'} 
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleTimeRange(range, btn) {
+            timeRange = range;
+            document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateChart();
+        }
+
+        // --- NEW SKILLS TAB LOGIC ---
+        function openSkillTab(key) {
+            const data = skillData[key];
+            if (!data) return;
+
+            // Buttons
+            document.querySelectorAll('.skill-tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Text Update (with simple fade effect logic)
+            const textArea = document.getElementById('skill-text');
+            textArea.style.opacity = 0;
+
+            setTimeout(() => {
+                let html = `
+                    <h3 class="skill-heading">${data.title}</h3>
+                    <p class="skill-desc">${data.desc}</p>
+                    <div class="skill-meta">
+                        <span class="meta-label">KEY RESEARCH:</span>
+                        <span class="meta-val">${data.meta.research}</span>
+                        <span class="meta-label">LEAD EXPERTISE:</span>
+                        <span class="meta-val">${data.meta.lead}</span>
+                    </div>
+                `;
+                textArea.innerHTML = html;
+                textArea.style.opacity = 1;
+            }, 200);
+
+            // Visuals Update
+            const visualArea = document.getElementById('skill-bars');
+            visualArea.innerHTML = ''; // clear
+            
+            data.bars.forEach(bar => {
+                const row = document.createElement('div');
+                row.className = 'skill-row';
+                row.innerHTML = `
+                    <span class="skill-name">${bar.label}</span>
+                    <div class="progress-track"><div class="progress-bar" style="width: 0%;"></div></div>
+                `;
+                visualArea.appendChild(row);
+                
+                // Trigger animation after append
+                setTimeout(() => {
+                    row.querySelector('.progress-bar').style.width = bar.width;
+                }, 100);
+            });
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            switchSystem('ocean', document.querySelector('.tab-btn.active'));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Board | Biosphere 2</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../css/style.css">
+
+  <style>
+    /* ---- Page reset + safe fallbacks (in case site CSS vars aren't present) ---- */
+    :root{
+      --b2-bg-0:#070A10;
+      --b2-bg-1:#0B1220;
+      --b2-panel: rgba(255,255,255,0.06);
+      --b2-panel-2: rgba(255,255,255,0.08);
+      --b2-line: rgba(255,255,255,0.10);
+      --b2-text: rgba(255,255,255,0.92);
+      --b2-muted: rgba(255,255,255,0.62);
+      --b2-accent: #67E8F9;
+      --b2-accent-2: #A78BFA;
+
+      --b2-radius: 18px;
+      --b2-shadow: 0 18px 55px rgba(0,0,0,0.45);
+
+      --b2-font-heading: var(--font-heading, "Space Grotesk", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif);
+      --b2-font-body: var(--font-body, "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif);
+    }
+
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      color: var(--b2-text);
+      font-family: var(--b2-font-body);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(103,232,249,0.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 20%, rgba(167,139,250,0.16), transparent 52%),
+        radial-gradient(1000px 800px at 50% 105%, rgba(34,197,94,0.10), transparent 55%),
+        linear-gradient(180deg, var(--b2-bg-0), var(--b2-bg-1));
+      overflow: hidden; /* key: no page scrolling */
+    }
+
+    /* Make the page always fit the viewport, regardless of header height */
+    body{
+      display: grid;
+      grid-template-rows: auto 1fr; /* header + content */
+    }
+
+    /* If your global footer injects content, hide it to keep this a single-screen page */
+    #global-footer{ display:none; }
+
+    /* ---- Single-screen layout ---- */
+    .board-screen{
+      min-height: 0; /* allows children to size inside the grid row */
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: clamp(12px, 1.6vw, 18px);
+      padding: clamp(14px, 2.2vw, 26px);
+    }
+
+    .top-panel{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .kicker{
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--b2-muted);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .kicker .dot{
+      width: 9px; height: 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--b2-accent), var(--b2-accent-2));
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+    }
+
+    .title{
+      margin:0;
+      font-family: var(--b2-font-heading);
+      font-weight: 700;
+      font-size: clamp(1.6rem, 2.6vw, 2.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle{
+      margin: 10px 0 0;
+      max-width: 70ch;
+      color: var(--b2-muted);
+      font-size: clamp(0.9rem, 1.1vw, 1rem);
+      line-height: 1.35;
+    }
+
+    .subnav{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+
+    .pill{
+      text-decoration:none;
+      color: var(--b2-text);
+      font-size: 0.85rem;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--b2-line);
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      white-space: nowrap;
+    }
+    .pill:hover{
+      transform: translateY(-1px);
+      border-color: rgba(103,232,249,0.40);
+      background: rgba(255,255,255,0.07);
+    }
+    .pill.primary{
+      border-color: rgba(103,232,249,0.35);
+      background: linear-gradient(135deg, rgba(103,232,249,0.14), rgba(167,139,250,0.10));
+    }
+
+    /* ---- Roster panel ---- */
+    .roster-panel{
+      min-height: 0;
+      border-radius: var(--b2-radius);
+      border: 1px solid var(--b2-line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      box-shadow: var(--b2-shadow);
+      overflow: hidden; /* keeps the “card” clean */
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .roster-header{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.10);
+    }
+
+    .roster-header .label{
+      font-family: var(--b2-font-heading);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .roster-header .count{
+      color: var(--b2-muted);
+      font-size: 0.9rem;
+    }
+
+    .roster-wrap{
+      min-height: 0;
+      padding: 14px;
+    }
+
+    /* Fixed-row grid so everything fits on one screen (no page scrolling). */
+    .roster-grid{
+      list-style:none;
+      padding:0;
+      margin:0;
+
+      height: 100%;
+      display:grid;
+      gap: 12px;
+
+      --cols: 3;
+      --rows: 7;
+
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+    }
+
+    /* Ultra-wide: more columns, fewer rows */
+    @media (min-width: 1500px){
+      .roster-grid{ --cols: 4; --rows: 6; }
+    }
+
+    /* Smaller screens: this will get tight; keep “no page scroll” by allowing the roster area itself to scroll */
+    @media (max-width: 980px){
+      .roster-grid{ --cols: 2; --rows: 11; }
+      .roster-wrap{ overflow: auto; }
+    }
+
+    @media (max-width: 560px){
+      .roster-grid{ --cols: 1; --rows: 21; }
+      .roster-wrap{ overflow: auto; }
+    }
+
+    .member{
+      position: relative;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      padding: 12px 12px 10px;
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      min-height: 0;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .member::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      border-radius: 16px;
+      pointer-events:none;
+      opacity: 0;
+      background: radial-gradient(500px 180px at 10% 10%, rgba(103,232,249,0.12), transparent 60%),
+                  radial-gradient(500px 180px at 90% 10%, rgba(167,139,250,0.10), transparent 60%);
+      transition: opacity 180ms ease;
+    }
+
+    .member:hover{
+      transform: translateY(-2px);
+      border-color: rgba(103,232,249,0.30);
+      background: rgba(255,255,255,0.06);
+    }
+    .member:hover::before{ opacity: 1; }
+
+    .member a{
+      color: var(--b2-text);
+      text-decoration:none;
+    }
+
+    .name{
+      font-family: var(--b2-font-heading);
+      font-weight: 650;
+      font-size: clamp(0.98rem, 1.1vw, 1.08rem);
+      letter-spacing: -0.01em;
+      display:flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .name .ext{
+      color: rgba(255,255,255,0.55);
+      font-size: 0.95em;
+      flex: 0 0 auto;
+      opacity: 0;
+      transform: translateY(1px);
+      transition: opacity 180ms ease;
+    }
+    .member:hover .name .ext{ opacity: 1; }
+
+    .role{
+      color: var(--b2-muted);
+      font-size: clamp(0.78rem, 0.95vw, 0.88rem);
+      line-height: 1.25;
+
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .badge{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(103,232,249,0.35);
+      background: linear-gradient(135deg, rgba(103,232,249,0.18), rgba(167,139,250,0.12));
+      color: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .member.chair{
+      border-color: rgba(103,232,249,0.28);
+      background: linear-gradient(180deg, rgba(103,232,249,0.08), rgba(255,255,255,0.04));
+    }
+
+    /* Accessible focus */
+    .member a:focus-visible, .pill:focus-visible{
+      outline: 2px solid rgba(103,232,249,0.65);
+      outline-offset: 3px;
+      border-radius: 12px;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .member, .pill, .member::before, .name .ext{ transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Global header (site component) -->
+  <div id="global-header"></div>
+
+  <main class="board-screen" aria-label="Biosphere 2 Board">
+    <div class="top-panel">
+      <div>
+        <div class="kicker"><span class="dot" aria-hidden="true"></span>Sector: Governance</div>
+        <h1 class="title">Biosphere 2 Board</h1>
+        <p class="subtitle">
+          A single-screen directory of board and advisory leadership. No images, clean typography, and quick access to external profiles.
+        </p>
+      </div>
+
+      <nav class="subnav" aria-label="Related pages">
+        <a class="pill primary" href="leadership.html">Leadership Directory</a>
+        <a class="pill" href="strategic-plan.html">Strategic Plan</a>
+      </nav>
+    </div>
+
+    <section class="roster-panel" aria-label="Board roster">
+      <header class="roster-header">
+        <div class="label">Roster</div>
+        <div class="count">21 members</div>
+      </header>
+
+      <div class="roster-wrap">
+        <ul class="roster-grid" role="list">
+          <li class="member chair">
+            <span class="badge">Chair</span>
+            <div class="name">
+              <a href="https://trbfoundations.org/about-us/board-of-trustees/" target="_blank" rel="noopener" aria-label="Sarah Smallhouse (opens in a new tab)">Sarah Smallhouse <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role"><strong>Chair, Biosphere 2 Board</strong> · President, Thomas R. Brown Foundations</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://environment.yale.edu/about/leadership/advisory-board/edward-p-bass" target="_blank" rel="noopener" aria-label="Edward Bass (opens in a new tab)">Edward Bass <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">CEO, Fine Line, Inc.</div>
+          </li>
+
+          <li class="member chair">
+            <span class="badge">Chair</span>
+            <div class="name">
+              <a href="https://www.minerva.edu/people/vicki-chandler/" target="_blank" rel="noopener" aria-label="Vicki Chandler (opens in a new tab)">Vicki Chandler <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role"><strong>Chair, Education Advisory Board</strong> · Provost, Minerva University</div>
+          </li>
+
+          <li class="member chair">
+            <span class="badge">Chair</span>
+            <div class="name">
+              <a href="https://lsa.umich.edu/eeb/people/faculty/degold.html" target="_blank" rel="noopener" aria-label="Deborah Goldberg (opens in a new tab)">Deborah Goldberg <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role"><strong>Chair, Science Advisory Board</strong> · Professor of Ecology, University of Michigan</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://environment.arizona.edu/person/jim-buizer" target="_blank" rel="noopener" aria-label="James Buizer (opens in a new tab)">James Buizer <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Founding Director, Arizona Institutes for Resilience</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://science.arizona.edu/person/ron-carsten" target="_blank" rel="noopener" aria-label="Ron Carsten (opens in a new tab)">Ron Carsten <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Former Chief Engineer, Raytheon</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://www.pearson.com/en-us/subject-catalog/p/christopherson/P200000006421" target="_blank" rel="noopener" aria-label="Robert Christopherson (opens in a new tab)">Robert Christopherson <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Geosystems Author &amp; Professor Emeritus</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://lsa.umich.edu/earth/people/faculty/colejul.html" target="_blank" rel="noopener" aria-label="Julie Cole (opens in a new tab)">Julie Cole <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Professor, Earth and Environmental Sciences, University of Michigan</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://tipresourcelab.net/people/teresa-de-leon-zamora/" target="_blank" rel="noopener" aria-label="Teresa de León (opens in a new tab)">Teresa de León <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Sustainability Research, Universidad Iberoamericana Puebla</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://engineering.cmu.edu/directory/bios/dzombak-david.html" target="_blank" rel="noopener" aria-label="David Dzombak (opens in a new tab)">David Dzombak <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Professor Emeritus, Carnegie Mellon University</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://www.embl.org/people/person/edith-heard/" target="_blank" rel="noopener" aria-label="Edith Heard (opens in a new tab)">Edith Heard <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Director General, EMBL</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://isd.life/about-us/stephen-jordan/" target="_blank" rel="noopener" aria-label="Stephen Jordan (opens in a new tab)">Stephen Jordan <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">CEO, Institute for Sustainable Development</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://france-arizona.arizona.edu/people/eric-lichtenheld" target="_blank" rel="noopener" aria-label="Eric Lichtenheld (opens in a new tab)">Eric Lichtenheld <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">President and CEO, Heliae Development</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="http://web.ecologia.unam.mx/laboratorios/conducta/index.php/integrantes/dr-constantino-macias-garcia" target="_blank" rel="noopener" aria-label="Constantino Macias (opens in a new tab)">Constantino Macias <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Director, Instituto de Ecología, UNAM</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://www.forbes.com/profile/john-mars/" target="_blank" rel="noopener" aria-label="John Mars (opens in a new tab)">John Mars <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Mars, Inc.</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://www.dri.edu/directory/sean-mckenna/" target="_blank" rel="noopener" aria-label="Sean McKenna (opens in a new tab)">Sean McKenna <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Executive Director, Division of Hydrologic Sciences (DRI)</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://plantsciences.ucdavis.edu/people/howard-shapiro" target="_blank" rel="noopener" aria-label="Howard-Yana Shapiro (opens in a new tab)">Howard-Yana Shapiro <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Senior Fellow, UC Davis &amp; Chief Ag Officer, Mars Inc.</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://schoolgardens.arizona.edu/person/moses-thompson" target="_blank" rel="noopener" aria-label="Moses Thompson (opens in a new tab)">Moses Thompson <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">School Gardening Coordinator, University of Arizona</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://www.geofisica.unam.mx/if/personas/inv/urrutia_fucugauchi_jaime.html" target="_blank" rel="noopener" aria-label="Jaime Urrutia-Fucugauchi (opens in a new tab)">Jaime Urrutia-Fucugauchi <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Geomagnetism, UNAM &amp; Director, Chicxulub Institute</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://biosphere2.org/about/board-advisors" target="_blank" rel="noopener" aria-label="Daniel Warmack (opens in a new tab)">Daniel Warmack <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Equity Holdings, Ltd.</div>
+          </li>
+
+          <li class="member">
+            <div class="name">
+              <a href="https://energy.colostate.edu/person/bryan-willson/" target="_blank" rel="noopener" aria-label="Bryan Willson (opens in a new tab)">Bryan Willson <span class="ext" aria-hidden="true">↗</span></a>
+            </div>
+            <div class="role">Professor of Mechanical Engineering, Colorado State</div>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <div id="global-footer"></div>
+
+  <script src="../../js/components.js"></script>
+  <script>
+    // Keep your existing site initialization
+    new B2Interface(2);
+  </script>
+</body>
+</html>

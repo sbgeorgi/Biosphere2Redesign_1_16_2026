@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio2 Neural Interface</title>
+    
+    <!-- Chart.js Ecosystem -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    
+    <!-- Icons & Fonts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* 2025 Palette */
+            --bg-deep: #050505;
+            --bg-panel: rgba(20, 20, 20, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent-primary: #3b82f6; /* Electric Blue */
+            --accent-glow: rgba(59, 130, 246, 0.4);
+            --accent-secondary: #8b5cf6; /* Violet */
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            padding: 24px;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        aside {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: 100%;
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glass);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toggles */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+        input[type="checkbox"] { width: auto; }
+
+        /* --- Main Grid --- */
+        main {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 24px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* KPI Row (Bento Grid) */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-label { font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .kpi-value { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            margin-top: 8px; 
+            letter-spacing: -1px;
+        }
+        .kpi-unit { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+        .kpi-delta { font-size: 0.8rem; margin-top: 4px; display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        
+        .positive { color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .negative { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .neutral { color: var(--text-muted); background: rgba(255,255,255,0.05); }
+
+        /* Chart Area */
+        .chart-wrapper {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+            flex-grow: 1;
+            min-height: 0;
+        }
+        
+        /* Advanced Stats Row */
+        .analysis-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            height: 220px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 0.9rem;
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: white; }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px); border-radius: var(--radius-lg); z-index: 10;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid rgba(59,130,246,0.3);
+            border-top: 4px solid var(--accent-primary); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="brand"><i class="fas fa-dna" style="color:var(--accent-primary)"></i> BIOSPHERE2 : DASHBOARD</div>
+        
+        <div class="control-group">
+            <label>1. System Integrity</label>
+            <div id="file-status" class="status-badge">
+                <i class="fas fa-check-circle"></i> Sensor Map Auto-Loaded
+            </div>
+        </div>
+
+        <div class="control-group" style="flex-grow:1; display:flex; flex-direction:column;">
+            <label>2. Sensor Selection</label>
+            <input type="text" id="filter" placeholder="Search Node ID..." style="margin-bottom:10px;">
+            <select id="sensors" size="10" style="flex-grow:1;">
+                <option>Loading sensor database...</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Visualization Config</label>
+            <div class="toggle-row">
+                <span><i class="fas fa-wave-square" style="color:var(--success); margin-right:5px"></i> Trend Line (SMA)</span>
+                <input type="checkbox" id="toggleSMA" checked>
+            </div>
+            <div class="toggle-row" style="margin-top:5px">
+                <span><i class="fas fa-exclamation-circle" style="color:var(--danger); margin-right:5px"></i> Anomalies</span>
+                <input type="checkbox" id="toggleOutliers">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
+                <span style="font-size:0.8rem; color:var(--text-muted)">Smoothing:</span>
+                <input type="number" id="smaPeriod" value="20" min="2" max="200" style="padding:6px; flex-grow:1;">
+            </div>
+        </div>
+
+        <button id="fetchBtn" class="btn-primary" disabled>
+            INITIATE VISUALIZATION
+        </button>
+    </aside>
+
+    <main>
+        <!-- Top Row: Advanced KPIs -->
+        <div class="kpi-container">
+            <div class="card">
+                <div class="kpi-label">Current Reading <i class="fas fa-satellite-dish"></i></div>
+                <div class="kpi-value" id="kpi-current">--</div>
+                <div class="kpi-delta neutral" id="kpi-status">STANDBY</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Overall Trend <i class="fas fa-chart-line"></i></div>
+                <div class="kpi-value" id="kpi-trend">--%</div>
+                <div class="kpi-delta" id="kpi-trend-arrow">--</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Volatility Index <i class="fas fa-bolt"></i></div>
+                <div class="kpi-value" id="kpi-volatility">--</div>
+                <div class="kpi-delta" id="kpi-stability">--</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Dynamic Range <i class="fas fa-ruler-vertical"></i></div>
+                <div class="kpi-value" id="kpi-range" style="font-size:1.4rem; margin-top:12px">--</div>
+                <div class="kpi-delta neutral" id="kpi-delta-val">--</div>
+            </div>
+        </div>
+
+        <!-- Middle: Main Chart -->
+        <div class="chart-wrapper">
+            <div class="loading-overlay" id="loader"><div class="spinner"></div></div>
+            <canvas id="mainChart"></canvas>
+            <button onclick="resetZoom()" style="position:absolute; top:20px; right:20px; background:rgba(0,0,0,0.5); border:1px solid #444; color:white; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:0.8rem;">
+                <i class="fas fa-compress"></i> Reset
+            </button>
+        </div>
+
+        <!-- Bottom: Detailed Analysis -->
+        <div class="analysis-container">
+            <div class="card">
+                <div class="kpi-label">Value Distribution (Histogram) <i class="fas fa-bar-chart"></i></div>
+                <div style="position: relative; height: 100%; width: 100%;">
+                    <canvas id="histChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="kpi-label" style="margin-bottom:15px">Statistical Matrix</div>
+                <div class="stat-row">
+                    <span>Peak Value Time</span>
+                    <span class="stat-val" id="stat-peak-time">--:--</span>
+                </div>
+                <div class="stat-row">
+                    <span>Lowest Value Time</span>
+                    <span class="stat-val" id="stat-low-time">--:--</span>
+                </div>
+                <div class="stat-row">
+                    <span>Average (Mean)</span>
+                    <span class="stat-val" id="stat-mean">--</span>
+                </div>
+                <div class="stat-row">
+                    <span>Std Deviation (σ)</span>
+                    <span class="stat-val" id="stat-std">--</span>
+                </div>
+                <div class="stat-row">
+                    <span>Sample Count</span>
+                    <span class="stat-val" id="stat-count">0</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Core Configuration ---
+        const PROXY_URL = 'https://corsproxy.io/?';
+        const TARGET_URL = 'https://data.b2.arizona.edu/Bio2Controls/TimeSeries.jsp?tab=';
+        
+        let sensorMap = {};
+        let currentData = [];
+        let mainChart = null;
+        let histChart = null;
+        let currentUnit = '';
+
+        // UI References
+        const ui = {
+            filter: document.getElementById('filter'),
+            sensors: document.getElementById('sensors'),
+            btn: document.getElementById('fetchBtn'),
+            fileStatus: document.getElementById('file-status'),
+            loader: document.getElementById('loader'),
+            sma: document.getElementById('toggleSMA'),
+            outliers: document.getElementById('toggleOutliers'),
+            period: document.getElementById('smaPeriod'),
+            kpiCur: document.getElementById('kpi-current'),
+            kpiStatus: document.getElementById('kpi-status'),
+            kpiTrend: document.getElementById('kpi-trend'),
+            kpiArrow: document.getElementById('kpi-trend-arrow'),
+            kpiVol: document.getElementById('kpi-volatility'),
+            kpiStab: document.getElementById('kpi-stability'),
+            kpiRange: document.getElementById('kpi-range'),
+            kpiDelta: document.getElementById('kpi-delta-val'),
+            statPeak: document.getElementById('stat-peak-time'),
+            statLow: document.getElementById('stat-low-time'),
+            statMean: document.getElementById('stat-mean'),
+            statStd: document.getElementById('stat-std'),
+            statCount: document.getElementById('stat-count')
+        };
+
+        // --- 1. Initialization (Automatic Map Loading) ---
+        async function loadMap() {
+            try {
+                const response = await fetch('sensor_map.json');
+                if (!response.ok) throw new Error("Could not find sensor_map.json in directory");
+                const data = await response.json();
+                initSystem(data);
+            } catch (err) {
+                console.error("Map load failed:", err);
+                ui.sensors.innerHTML = '<option>Error: sensor_map.json not found</option>';
+            }
+        }
+
+        function initSystem(data) {
+            sensorMap = data;
+            populateSensorList(data);
+            ui.btn.disabled = false;
+        }
+
+        function populateSensorList(data, term="") {
+            ui.sensors.innerHTML = '';
+            const sortedKeys = Object.keys(data).sort();
+            sortedKeys.forEach(key => {
+                if(key.toLowerCase().includes(term.toLowerCase())) {
+                    const item = data[key];
+                    if (item.id) {
+                        const opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.dataset.unit = item.unit || '';
+                        opt.text = `${key} [${item.unit || 'Raw'}]`;
+                        ui.sensors.appendChild(opt);
+                    }
+                }
+            });
+        }
+
+        ui.filter.addEventListener('input', (e) => populateSensorList(sensorMap, e.target.value));
+
+        // --- 2. Data Engine ---
+        ui.btn.addEventListener('click', async () => {
+            const id = ui.sensors.value;
+            if (!id) return;
+            
+            const opt = ui.sensors.options[ui.sensors.selectedIndex];
+            currentUnit = opt.dataset.unit;
+            const label = opt.text.split(' [')[0];
+
+            ui.loader.style.display = 'flex';
+            ui.btn.disabled = true;
+
+            try {
+                // Fetch through Proxy to solve CORS
+                const encodedUrl = encodeURIComponent(`${TARGET_URL}${id}`);
+                const res = await fetch(`${PROXY_URL}${encodedUrl}`);
+                const text = await res.text();
+                
+                const match = text.match(/window\.chart1_chartModel\s*=\s*({[\s\S]*?});/);
+                if(!match) throw new Error("Data extraction failed");
+                
+                const raw = JSON.parse(match[1]);
+                
+                // Align Timezone and Offset
+                const offset = 62135596800; // 1AD to 1970
+                const timezoneCorrection = new Date().getTimezoneOffset() * 60 * 1000;
+                
+                const xVals = raw.layers[0].xValues;
+                const yVals = raw.layers[0].dataSets[0].data;
+
+                currentData = xVals.map((t, i) => {
+                    const val = yVals[i];
+                    // Filter nulls and dropouts
+                    if (val === null || Math.abs(val) < 0.0001) return null;
+                    return { 
+                        x: ((t - offset) * 1000) + timezoneCorrection, 
+                        y: val 
+                    };
+                }).filter(p => p !== null);
+
+                if (currentData.length === 0) {
+                    alert("No valid data points found for this sensor.");
+                    ui.kpiStatus.textContent = "NO DATA";
+                    ui.kpiStatus.className = "kpi-delta negative";
+                } else {
+                    analyzeAndRender(label);
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert("Critical error fetching data. Check proxy connectivity.");
+                ui.kpiStatus.textContent = "FETCH ERROR";
+                ui.kpiStatus.className = "kpi-delta negative";
+            } finally {
+                ui.loader.style.display = 'none';
+                ui.btn.disabled = false;
+            }
+        });
+
+        // Toggles
+        [ui.sma, ui.outliers, ui.period].forEach(el => el.addEventListener('change', () => {
+            if(currentData.length) analyzeAndRender(ui.sensors.options[ui.sensors.selectedIndex].text.split(' [')[0]);
+        }));
+
+        function analyzeAndRender(label) {
+            const yVals = currentData.map(d => d.y);
+            const n = yVals.length;
+            const last = yVals[n-1];
+            const first = yVals[0];
+            const sum = yVals.reduce((a,b) => a+b, 0);
+            const mean = sum / n;
+            const min = Math.min(...yVals);
+            const max = Math.max(...yVals);
+            
+            const std = Math.sqrt(yVals.map(v => Math.pow(v - mean, 2)).reduce((a,b)=>a+b,0) / n);
+            const trendPct = first !== 0 ? ((last - first) / Math.abs(first)) * 100 : 0;
+            const cv = mean !== 0 ? (std / Math.abs(mean)) * 100 : 0;
+
+            const peakPoint = currentData.reduce((max, p) => p.y > max.y ? p : max, currentData[0]);
+            const lowPoint = currentData.reduce((min, p) => p.y < min.y ? p : min, currentData[0]);
+
+            // KPIs
+            ui.kpiCur.innerHTML = `${last.toFixed(2)}${currentUnit ? `<span class="kpi-unit">${currentUnit}</span>` : ''}`;
+            ui.kpiStatus.textContent = "ONLINE";
+            ui.kpiStatus.className = "kpi-delta positive";
+
+            ui.kpiTrend.textContent = `${Math.abs(trendPct).toFixed(1)}%`;
+            ui.kpiArrow.innerHTML = trendPct > 0.1 ? '<i class="fas fa-arrow-up"></i> Rising' : (trendPct < -0.1 ? '<i class="fas fa-arrow-down"></i> Falling' : '<i class="fas fa-minus"></i> Flat');
+            ui.kpiArrow.className = "kpi-delta " + (Math.abs(trendPct) < 0.1 ? "neutral" : (trendPct > 0 ? "positive" : "negative"));
+
+            ui.kpiVol.textContent = cv.toFixed(1) + '%';
+            ui.kpiStab.textContent = cv < 10 ? "Stable" : "Volatile";
+            ui.kpiStab.className = "kpi-delta " + (cv < 10 ? "positive" : "negative");
+
+            ui.kpiRange.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`;
+            ui.kpiDelta.textContent = `Δ ${(max-min).toFixed(2)}`;
+
+            // Stats Matrix
+            ui.statMean.textContent = mean.toFixed(2);
+            ui.statStd.textContent = std.toFixed(3);
+            ui.statCount.textContent = n.toLocaleString();
+            ui.statPeak.textContent = new Date(peakPoint.x).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            ui.statLow.textContent = new Date(lowPoint.x).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+            renderMainChart(label, mean, std);
+            renderHistogram(yVals, min, max);
+        }
+
+        function renderMainChart(label, mean, std) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            if(mainChart) mainChart.destroy();
+
+            const datasets = [{
+                label: label,
+                data: currentData,
+                borderColor: '#3b82f6',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.2
+            }];
+
+            if(ui.sma.checked) {
+                const period = parseInt(ui.period.value);
+                const sma = currentData.map((d, i) => {
+                    if (i < period) return {x: d.x, y: null};
+                    const slice = currentData.slice(i-period, i);
+                    return {x: d.x, y: slice.reduce((a,b)=>a+b.y, 0)/period};
+                });
+                datasets.push({ label: `SMA (${period})`, data: sma, borderColor: '#10b981', borderWidth: 2, pointRadius: 0, fill: false });
+            }
+
+            if(ui.outliers.checked) {
+                const outliers = currentData.filter(d => Math.abs(d.y - mean) > (2 * std));
+                datasets.push({ label: 'Anomalies', data: outliers, backgroundColor: '#ef4444', type: 'scatter', pointRadius: 5 });
+            }
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { 
+                            type: 'time', 
+                            time: { tooltipFormat: 'HH:mm:ss' },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7280' }
+                        },
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7280' }
+                        }
+                    },
+                    plugins: { 
+                        zoom: { zoom: { wheel: { enabled: true }, mode: 'x' }, pan: { enabled: true, mode: 'x' } },
+                        legend: { labels: { color: '#e5e7eb' } }
+                    }
+                }
+            });
+        }
+
+        function renderHistogram(values, min, max) {
+            const ctx = document.getElementById('histChart').getContext('2d');
+            if(histChart) histChart.destroy();
+
+            const binCount = 15;
+            const bins = new Array(binCount).fill(0);
+            const step = (max - min) / binCount;
+            const labels = Array.from({length: binCount}, (_, i) => (min + (i*step)).toFixed(1));
+
+            values.forEach(v => {
+                let idx = Math.floor((v - min) / step);
+                bins[Math.min(idx, binCount - 1)]++;
+            });
+
+            histChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: bins, backgroundColor: 'rgba(139, 92, 246, 0.5)', borderColor: '#8b5cf6', borderWidth: 1 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#6b7280', size: 10 } }, y: { display: false } }
+                }
+            });
+        }
+
+        function resetZoom() { if(mainChart) mainChart.resetZoom(); }
+
+        // Start Auto-load
+        window.addEventListener('DOMContentLoaded', loadMap);
+
+    </script>
+</body>
+</html>

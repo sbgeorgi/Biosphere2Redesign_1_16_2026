@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leadership | Biosphere 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .leader-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+            padding-bottom: 5rem;
+        }
+        .id-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--grid-line);
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .id-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+            transform: translateY(-5px);
+        }
+        .id-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent-primary);
+            transition: var(--transition);
+        }
+        .id-card:hover::before {
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+        .id-img-container {
+            width: 140px;
+            height: 190px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border-right: 1px solid var(--grid-line);
+        }
+        .id-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1);
+            transition: filter 0.3s ease;
+        }
+        .id-card:hover .id-img-container img {
+            filter: grayscale(0);
+        }
+        .id-content {
+            padding: 1.25rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 190px;
+        }
+        .id-name {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            color: white;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+        .id-title {
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        .id-data {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .id-data a { color: var(--text-muted); border-bottom: 1px dotted #555; text-decoration: none; }
+        .id-data a:hover { color: white; border-color: white; }
+        
+        /* Hidden container for modal content */
+        .hidden-detail { display: none; }
+        
+        /* "Click for bio" indicator */
+        .click-indicator {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: var(--transition);
+        }
+        .id-card:hover .click-indicator {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER CONTAINER -->
+    <div id="global-header"></div>
+
+    <!-- 2. UNIQUE CONTENT -->
+    <header class="hero" style="height: 40vh; min-height: 300px;">
+        <div class="hero-bg-media">
+            <img src="https://biosphere2.org/sites/default/files/styles/az_full_width_bg_large/public/2021-10/3_Biomes_Ocean_Photo_Option%203.jpg.webp?itok=Em1QPdlr" alt="Background">
+            <div class="overlay-grid"></div>
+        </div>
+        <div class="container hero-content" style="padding-left: 0;">
+            <div class="hero-label">SECTOR: PERSONNEL</div>
+            <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 0;">LEADERSHIP DIRECTORY</h1>
+        </div>
+    </header>
+
+    <section class="container" style="padding-top: 4rem;">
+        <div class="leader-grid">
+
+            <!-- Card 1: John Adams -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/JA%20headshot_0.jpeg.webp?itok=z2w1-XS5" alt="John Adams">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">John Adams</div>
+                    <div class="id-title">Deputy Director<br>Chief Operations Officer</div>
+                    <div class="id-data">COMM: 520-621-3955</div>
+                    <div class="id-data">MAIL: <a href="mailto:jadamsb2@arizona.edu">jadamsb2@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                
+                <!-- Hidden Data -->
+                <div class="hidden-detail">
+                    <p>For two decades, John Adams has helped drive the evolution of Biosphere 2 through positions of progressive responsibility and oversight. Starting in 1995 he lead the terrestrial research initiatives exploring the effect of elevated CO2 on the complex mesocosms of Biosphere 2.</p>
+                    <p>Building on his deep knowledge of the facility and its science, Adams became Biosphere 2's Media Coordinator and Public Spokesperson in 1999, fielding inquiries from around the world, building public understanding of the University's groundbreaking earth systems science research and developing its K-12 education programs (Passport to Learning™).</p>
+                    <p>Adams' experience and vision filled critical roles throughout that period in several key positions, culminating in his being named Assistant Director of Planning and Facilities, a mantle he held for seven years. In 2014, Adams advanced to his current leadership role of Biosphere 2 Deputy Director. In part, the promotion marked a return to his roots, engaging as a key member of the team that plans and directs all research and related activities inside Biosphere 2 and the surrounding campus.</p>
+                </div>
+            </div>
+
+            <!-- Card 2: Joaquin Ruiz (UPDATED) -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/Ruiz_Headshot.jpg.webp?itok=q1oGBnQh" alt="Joaquin Ruiz">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Dr. Joaquin Ruiz</div>
+                    <div class="id-title">Director, Biosphere 2</div>
+                    <div class="id-data">MAIL: <a href="mailto:jruiz@arizona.edu">jruiz@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Joaquin Ruiz received his B.S. (1977) in Geology and Chemistry from the University of Miami and his M.S.(1980) and Ph.D. (1983) in Geology from the University of Michigan. He was Assistant Professor at the University of Miami from 1982 to 1983. In 1983, he joined the University of Arizona Geosciences Department as Assistant Professor and was promoted to Associate Professor in 1989 and Professor in 1993, serving as head of the Department of Geosciences from 1995 to 2000.</p>
+                    <p>He served as Dean of the College of Science from 2000-2019, Executive Dean of the Colleges of Letters, Arts and Science from 2009-2018, and Vice President for Innovation from 2013-2019. He was appointed Vice President of Global Environmental Futures in 2019 and has served as the Thomas R. Brown Chair and Director of Biosphere 2 since 2013.</p>
+                    <p>Dr. Ruiz served as President of the Geological Society of America (2010-2011). He is also a Fellow of the Society of Economic Geologists, and a member of the American Geophysical Union, the American Chemical Society, the Geochemical Society, and the National Research Council of the National Academies of Science. He is a member of the Mexican Academy of Sciences and was named a National Researcher by the Mexican government in 2010, when he was recognized for his outstanding scientific contributions and efforts to enhance Mexico's scientific and technological capacity through collaborations with the UA and research institutions in Mexico.</p>
+                    <p>In 2018, the Mexican Secretary of State named Dr. Ruiz one of forty distinguished Mexican citizens living abroad who have brought distinction to the country. He has served as Secretary of the Volcanology Section of the American Geophysical Union, Councillor of the Geological Society of America, and as a National Science Foundation Panel Member for the Instrumentation and Facilities Program and the Centers for Excellence in Science and Technology Program. He has served as Associate Editor of the American Journal of Science, Geology, Revista, and Geofísica International of the Institute of Geology, UNAM.</p>
+                    <p>As a scientist with equal abilities in chemistry and in geology, Dr. Ruiz addresses many first-order problems in the Earth Sciences, such as the development of new isotope systems for studying ore deposits and the tectonic processes involved in the growth and evolution of Mexico. His research team addresses problems ranging from the origins of life to present-day climate change.</p>
+                    <br>
+                    <p><em>To schedule an appointment with Dr. Ruiz, please contact Bernadette Olson at bernadettem@arizona.edu.</em></p>
+                </div>
+            </div>
+
+            <!-- Card 3: Aaron Bugaj -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2025-01/277231407_10159390823903961_1712135023889890918_n.jpg.webp?itok=nplCHZZb" alt="Aaron Bugaj">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Aaron Bugaj</div>
+                    <div class="id-title">Research Technologist III<br>Biosphere 2 Podcast Host</div>
+                    <div class="id-data">MAIL: <a href="mailto:bugaja@arizona.edu">bugaja@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Aaron Bugaj is the Lead Technologist on the Landscape Evolution Observatory (LEO) at Biosphere 2, where he drives research at the intersection of science, technology, and creativity. In addition to his work with LEO, Aaron leads major science communication and marketing initiatives at Biosphere 2, including the Biosphere 2 Podcast, film production, digital marketing campaigns, and the development of cinematic data visualization, animation, and film projects that bring complex science to broad audiences.</p>
+                    <p>Aaron holds a B.S. in Environmental Science from Seattle University and an M.S. in Marketing Science from the University of Arizona Eller School of Management. His expertise bridges environmental research, multimedia production, and strategic marketing, positioning him as a leader in translating scientific discovery into compelling stories that engage the public and inspire action.</p>
+                    
+                    <h5 class="bio-subtitle">Links</h5>
+                    <ul class="bio-list">
+                        <li><a href="#" target="_blank">Aaron's Production Work</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 4: Katerina Dontsova -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/Dontova_Katerina.jpg.webp?itok=eg7HAcX4" alt="Katerina Dontsova">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Dr. Katerina Dontsova</div>
+                    <div class="id-title">Director of Analytical Lab<br>Associate Professor</div>
+                    <div class="id-data">COMM: 601-868-0279</div>
+                    <div class="id-data">MAIL: <a href="mailto:dontsova@email.arizona.edu">dontsova@email.arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>I am a soil scientist with interest in interactions between physical, chemical, and biological processes that take place in the soils. My primary focus is in soil chemistry, including dissolution, precipitation, and sorption reactions in the soils with both basic science applications including critical zone processes, mineral-organic interactions and applied research looking at fate and transport of organic contaminants and nano-particles in soils that is relevant to environmental quality.</p>
+                    <p>My research in Biosphere 2 is focused on weathering processes and carbon cycling under influence of abiotic and biological factors. Specifically, we examine inorganic carbon sequestration during dissolution of basalt covering Landscape Evolution Observatory slopes and formation of spatial and temporal heterogeneity on the slopes due to its incongruent weathering. We also study biological weathering, how plants and microorganisms influence rock weathering and soil formation and how products of the weathering are compartmentalized within the ecosystem, as well as effect of climate change on these processes. I lead Biosphere 2 biogeochemistry lab that supports LEO and other Biosphere 2 and University of Arizona projects.</p>
+                    <p>I also serve as a director of the NSF funded the Environmental and Earth Systems Research Experience (REU) for Undergraduates Program at Biosphere 2.</p>
+                    
+                    <h5 class="bio-subtitle">Current Projects</h5>
+                    <ul class="bio-list">
+                        <li>ROCK-PLANT INTERACTIONS DRIVING EARLY SOIL DEVELOPMENT AND LANDSCAPE EVOLUTION. $270,000. CNRS & UA International Research Center. 09/01/2021-08/31/2025.</li>
+                        <li>REU SITE: ENVIRONMENTAL AND EARTH SYSTEMS RESEARCH AT BIOSPHERE 2. $868,269. NSF. 09/01/2021-08/31/2026.</li>
+                        <li>INTEGRATIVE APPROACH TO QUANTIFYING FATE OF MUNITIONS CONSTITUENTS ON TRAINING RANGES. $970,309. DOD SERDP. 5/1/19-1/31/22.</li>
+                        <li>Primary succession of plant and microbial life. Joint Genome Institute. 10/1/2022–9/31/2024.</li>
+                        <li>Collaborative Research: GCR: Growing a New Science of Landscape Terraformation. $3,513,801.</li>
+                        <li>Enhanced weathering and soil carbon sequestration in Arizona agricultural systems. $70,929. CALS Innovation Venture Investment Program.</li>
+                    </ul>
+
+                    <h5 class="bio-subtitle">Past Projects</h5>
+                    <ul class="bio-list">
+                        <li>A “Local” Remote Sensing capability to enhance the science of Landscape Terraformation at UArizona’s Landscape Evolution Observatory (LEO). $137,948.</li>
+                        <li>REU SITE: EARTH SYSTEMS RESEARCH FOR ENVIRONMENTAL SOLUTIONS. $454,770. NSF.</li>
+                        <li>Stabilization of Organic Carbon by Complexation with Iron Colloids Formed During Biogeochemical Weathering of Basalt. $86,036.</li>
+                        <li>Collaborative research: Coupled hydrological and geochemical process evolution at the Landscape Evolution Observatory. $486,256. NSF.</li>
+                        <li>Abiotic and biologically-driven basalt weathering and C sequestration under changing climate. CNSR.</li>
+                        <li>DISSOLUTION OF NTO, DNAN AND INSENSITIVE MUNITIONS FORMULATIONS AND THEIR FATES IN SOILS. $1,350,466. DOD SERDP.</li>
+                    </ul>
+                    
+                    <h5 class="bio-subtitle">Degrees</h5>
+                    <ul class="bio-list">
+                        <li>PhD, Agronomy, Purdue University, West Lafayette, IN, 2002</li>
+                        <li>MS, Agronomy, Purdue University, West Lafayette, IN, 1998</li>
+                        <li>Agricultural Chemistry and Soil Science, National Agricultural University, Kyiv, Ukraine, 1995</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 5: Scott Saleska -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/saleska_scott_0.jpg.webp?itok=kT8anog9" alt="Scott Saleska">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Dr. Scott Saleska</div>
+                    <div class="id-title">Director of Landscape Evolution Observatory Research</div>
+                    <div class="id-data">COMM: 520-626-1500</div>
+                    <div class="id-data">MAIL: <a href="mailto:saleska@arizona.edu">saleska@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>My research focuses on what might be called “biogeochemical ecology,” asking questions about how climate interacts with plant physiology, demography, and ecological processes to influence or control biogeochemical cycling from local to global scales.</p>
+                    <p>Just one example of the need for more complete understanding in this area is the lack of species interactions in modern global climate models, even though such interactions can be critically important in controlling ecosystem carbon cycling and hence, feedbacks to climate. Progress has been limited by the difficulty of bridging the gap between local-scale ecological interactions and broader biogeochemical processes. I use multidisciplinary approaches that combine classical techniques of field ecology and forestry with advanced technological methods (e.g., the micrometeorological eddy covariance method, isotopic techniques) and modeling to integrate biogeochemical processes to ecosystem scales.</p>
+                    
+                    <h5 class="bio-subtitle">Links</h5>
+                    <ul class="bio-list">
+                        <li><a href="#" target="_blank">Saleska Lab Website</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 6: Greg Barron-Gafford -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/Greg%20Barron-Gafford%202020.png.webp?itok=SVYQp_9l" alt="Greg Barron-Gafford">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Dr. Greg Barron-Gafford</div>
+                    <div class="id-title">Director of Food, Water, Energy Research</div>
+                    <div class="id-data">MAIL: <a href="mailto:gregbg@arizona.edu">gregbg@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Greg is a Biogeographer, which means his science sits at that exciting nexus of understanding how external forces (like environmental and human factors) and internal characteristics (like leaf biochemistry) determine where species can live and thrive.</p>
+                    <p>For the last 8 years, the Barron-Gafford research group has been building the field of 'agrivoltaics' -the concept of co-locating agriculture and photovoltaics (renewable energy from solar panels). We began this work in southern Arizona to study the benefits across the food-energy-water nexus, and over the years have developed a national and international program connecting with researchers in Colorado and Oregon (USA), and in Africa and the Middle East.</p>
+                    <p>Helping develop science-based solutions to help people adapt to the increasing pressures that come from a changing climate is a personal and professional goal.</p>
+                    
+                    <h5 class="bio-subtitle">Links</h5>
+                    <ul class="bio-list">
+                        <li><a href="#" target="_blank">Barron-Gafford Lab Website</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 7: Diane Thompson -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/DianeThompson-Headshot_012521-1%20copy_0.jpg.webp?itok=KnXYAK3F" alt="Diane Thompson">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Dr. Diane Thompson</div>
+                    <div class="id-title">Director of Marine Research</div>
+                    <div class="id-data">MAIL: <a href="mailto:thompsod@arizona.edu">thompsod@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Diane Thompson is an Associate Professor in the Department of Geosciences and the Director of Marine Research at the Biosphere 2. With a background in Marine Ecology (B.S. and M.S. from Florida Institute of Technology) and Geosciences (PhD, University of Arizona; Postdoctoral Fellow, National Center for Atmospheric Research), Diane applies her interdisciplinary expertise to:</p>
+                    <ul class="bio-list">
+                        <li>(1) Quantify tropical climate change(s) using corals, lake sediments, and models;</li>
+                        <li>(2) Assess factors promoting reef resilience to climate change;</li>
+                        <li>(3) Test novel solutions for reef restoration in the Biosphere 2 to ensure their benefits for generations to come.</li>
+                    </ul>
+                    <p>Her work spans a range of scales from local (e.g., reef-scale circulation) to global (e.g., climate change) and capitalizes on a blend of field and laboratory, observational and modeling, and experimental approaches.</p>
+                    
+                    <h5 class="bio-subtitle">Links</h5>
+                    <ul class="bio-list">
+                        <li><a href="#" target="_blank">Thompson Lab Website</a></li>
+                    </ul>
+                </div>
+            </div>
+
+             <!-- Card 8: Joost van Haren -->
+             <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/Joost_Headshot_Web.jpg.webp?itok=ZikQFjes" alt="Joost van Haren">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Dr. Joost van Haren</div>
+                    <div class="id-title">Director of Rainforest Research<br>Assistant Research Professor</div>
+                    <div class="id-data">MAIL: <a href="mailto:jvanhare@arizona.edu">jvanhare@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Dr. Joost van Haren is an earth scientist, who conducts his research on ecosystem responses to climate change in the Biosphere 2 rainforest and the rainforests of the Amazon basin. He also has an appointment with the honors college as a professor of practice to teach honors specific course and run the honors internships at Biosphere 2.</p>
+                    <p>During the practice of science, we try to better understand how the world around us functions and responds to changes. In the Biosphere 2 rainforest, the research focusses on tropical forest ecosystem and individual plant responses to climate change: increasing carbon dioxide concentrations, increasing temperature, and stronger and more frequent droughts.</p>
+                    <p>The research is inherently social in nature, because it is impossible for any human being to fully understand how the world around us functions. For optimal ecosystem research, we also need to understand how we can better communicate and work together.</p>
+                </div>
+            </div>
+
+            <!-- Card 9: Kai Staats -->
+            <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2021-09/Kai%20Headshot.jpg.webp?itok=5G7qMujf" alt="Kai Staats">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Kai Staats</div>
+                    <div class="id-title">Research Director of SAM</div>
+                    <div class="id-data">MAIL: <a href="mailto:kstaats@arizona.edu">kstaats@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Kai is a veteran developer of platforms for research and science education. He was co-founder and CEO of the world-renowned Yellow Dog Linux operating system for ten years. The YDL platform was used extensively in Department of Energy, NASA, and University research across a full spectrum of sciences.</p>
+                    <p>Kai designed and developed iConji, an icon-based language for international communication; wrote the machine learning algorithm Karoo GP which has been used at LIGO for classification of glitches and supernovae; and was principal designer of the Mt. Meru Astronomical Observatory in Tanzania, the first of its kind in East Africa.</p>
+                    <p>At Arizona State University Kai led the development of SIMOC, a research-grade computer simulation and educational interface hosted by National Geographic that enables citizen scientists to explore the complexity of a human habitat on Mars. Now, Kai and his team are constructing SAM, a hi-fidelity, hermetically sealed Mars habitat analog with greenhouse, living quarters, airlock, pressure suits, and half acre Mars yard located at the iconic University of Arizona Biosphere 2.</p>
+                    
+                    <h5 class="bio-subtitle">Links</h5>
+                    <ul class="bio-list">
+                        <li><a href="#" target="_blank">SAM Website</a></li>
+                    </ul>
+                    
+                    <h5 class="bio-subtitle">Degrees</h5>
+                    <ul class="bio-list">
+                        <li>BSc: Industrial Design, College of Architecture and Environmental Design, Arizona State University</li>
+                        <li>MSc: Applied Mathematics, University of Cape Town, South Africa</li>
+                    </ul>
+                </div>
+            </div>
+
+             <!-- Card 10: Jeff Larsen -->
+             <div class="id-card" onclick="openBio(this)">
+                <div class="id-img-container">
+                    <img src="https://biosphere2.org/sites/default/files/styles/az_medium/public/2025-03/Jeff_Headshot_AI_122-MA5mhJVQugc.jpeg.webp?itok=D4eK05zq" alt="Jeff Larsen">
+                </div>
+                <div class="id-content">
+                    <div class="id-name">Jeff Larsen</div>
+                    <div class="id-title">Innovation Officer</div>
+                    <div class="id-data">COMM: 720-838-7806</div>
+                    <div class="id-data">MAIL: <a href="mailto:jefflarsen@arizona.edu">jefflarsen@arizona.edu</a></div>
+                </div>
+                <div class="click-indicator">+</div>
+                <div class="hidden-detail">
+                    <p>Jeff Larsen leads strategic initiatives to advance earth science research through artificial intelligence and digital technologies. He serves as the Product Manager for Biosphere 3, an AI-powered platform for Science as a Service, and a student workforce development initiative in AI, XR, Digital Twins, Robotics, and Autonomous Research.</p>
+                    <p>In his role, Jeff serves as a key liaison between Biosphere 2 and various entrepreneurial partners in both public and private sectors. He focuses on fostering collaborations that leverage Biosphere 2's unique capabilities to drive innovation in digital technologies and entrepreneurship.</p>
+                    <p>Jeff founded and led several successful technology companies where he pioneered interactive video platforms for education and research. His academic background includes doctoral studies in Transatlantic Intellectual History at the University of Colorado at Boulder, where his research focused on the intersection of public television and existentialist philosophy.</p>
+                    <p>Through his work at Biosphere 2, Jeff continues to bridge the gap between cutting-edge research and practical applications, helping to establish Biosphere 2 as a leader in AI-enabled autonomous research systems.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- BIO MODAL OVERLAY -->
+    <div id="bioModal" class="modal-overlay">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeBio()">×</button>
+            <div class="modal-grid">
+                <!-- Left Side: Image & Key Info -->
+                <div class="modal-sidebar">
+                    <div class="modal-img-wrap">
+                        <img id="modalImg" src="" alt="Leader">
+                    </div>
+                    <div class="modal-key-info">
+                        <h2 id="modalName">Name</h2>
+                        <h4 id="modalTitle">Title</h4>
+                        <div id="modalContact" class="contact-block"></div>
+                    </div>
+                </div>
+                <!-- Right Side: Scrollable Bio -->
+                <div class="modal-body">
+                    <div id="modalBioContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. FOOTER CONTAINER -->
+    <div id="global-footer"></div>
+
+    <!-- 4. LOAD SCRIPTS -->
+    <script src="../../js/components.js"></script>
+    <script>
+        // Initialize with depth 2
+        new B2Interface(2);
+
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('bioModal');
+        const mImg = document.getElementById('modalImg');
+        const mName = document.getElementById('modalName');
+        const mTitle = document.getElementById('modalTitle');
+        const mContact = document.getElementById('modalContact');
+        const mBio = document.getElementById('modalBioContent');
+
+        function openBio(cardElement) {
+            // 1. Grab data from the clicked card
+            const imgParams = cardElement.querySelector('img').src;
+            const name = cardElement.querySelector('.id-name').innerText;
+            // Get innerText but allow for the <br> inside title to be treated as newline if needed, though simple text is fine
+            const title = cardElement.querySelector('.id-title').innerText; 
+            
+            // Get all .id-data elements (phone/email)
+            const dataFields = cardElement.querySelectorAll('.id-data');
+            let contactHTML = '';
+            dataFields.forEach(field => {
+                contactHTML += `<div class="modal-data-row">${field.innerHTML}</div>`;
+            });
+
+            // Get hidden bio HTML
+            const hiddenBio = cardElement.querySelector('.hidden-detail').innerHTML;
+
+            // 2. Populate Modal
+            mImg.src = imgParams;
+            mName.innerText = name;
+            mTitle.innerText = title;
+            mContact.innerHTML = contactHTML;
+            mBio.innerHTML = hiddenBio;
+
+            // 3. Show Modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeBio() {
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Close on clicking background
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeBio();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeBio();
+        });
+    </script>
+</body>
+</html>

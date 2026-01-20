@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biosphere 2 Live Data</title>
+
+    <!-- Chart.js Ecosystem -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+    <!-- Icons & Fonts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-panel: rgba(20, 20, 20, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden; /* No scrolling */
+        }
+
+        /* --- Sidebar --- */
+        aside {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-glass);
+            flex-shrink: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glass);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        
+        input:focus, select:focus { border-color: var(--accent-primary); }
+
+        /* Custom Scrollbar for Select */
+        select {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-primary) transparent;
+        }
+
+        #sensors {
+            flex-grow: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 8px;
+            overflow-y: auto;
+            white-space: nowrap; 
+        }
+
+        #sensors option { padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        optgroup { color: var(--accent-primary); font-weight: bold; margin-top: 10px; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; filter: grayscale(1); }
+
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 8px;
+            font-size: 0.8rem; margin-bottom: 5px;
+        }
+
+        /* --- Main Layout --- */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* KPI Row */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            flex-shrink: 0;
+            height: 110px;
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-label { font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .kpi-value { font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700; color: white; }
+        .kpi-unit { font-size: 0.9rem; font-weight: 400; color: var(--text-muted); }
+        .kpi-delta { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
+        
+        .positive { color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .negative { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .neutral { color: var(--text-muted); background: rgba(255, 255, 255, 0.05); }
+
+        /* Charts */
+        .chart-wrapper {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            position: relative;
+            flex-grow: 1; /* Takes all available height */
+            min-height: 0; /* Important */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analysis-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            height: 180px; /* Fixed small height for bottom stats */
+            flex-shrink: 0;
+        }
+
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border-glass); }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: white; }
+
+        .loading-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 10;
+            display: none; justify-content: center; align-items: center; border-radius: inherit;
+        }
+        .spinner {
+            width: 30px; height: 30px; border: 3px solid rgba(59,130,246,0.3);
+            border-top: 3px solid var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Helper */
+        .reset-zoom {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.6); border: 1px solid #444; color: white;
+            padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.7rem; z-index: 5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside>
+        <div class="brand">
+            <i class="fas fa-leaf" style="color:var(--success)"></i> Biosphere 2
+        </div>
+
+        <div class="control-group" style="flex-grow:1; overflow:hidden;">
+            <label>Sensor Network</label>
+            <input type="text" id="filter" disabled placeholder="Search..." style="margin-bottom:10px;">
+            <select id="sensors" disabled multiple>
+                <option>Loading Map...</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Analysis Config</label>
+            <div class="toggle-row">
+                <span>Trend Line</span>
+                <input type="checkbox" id="toggleSMA" checked>
+            </div>
+            <div class="toggle-row">
+                <span>Anomalies</span>
+                <input type="checkbox" id="toggleOutliers">
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; font-size:0.8rem;">
+                <span style="color:var(--text-muted)">Smoothing</span>
+                <input type="number" id="smaPeriod" value="20" min="2" max="100" style="width:60px; padding:4px;">
+            </div>
+        </div>
+
+        <button id="fetchBtn" class="btn-primary" disabled>LOAD DATA</button>
+    </aside>
+
+    <main>
+        <!-- KPI Row -->
+        <div class="kpi-container">
+            <div class="card">
+                <div class="kpi-label">Current Value</div>
+                <div class="kpi-value" id="kpi-current">--</div>
+                <div class="kpi-delta neutral" id="kpi-status">WAITING</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Trend (Slope)</div>
+                <div class="kpi-value" id="kpi-trend">--%</div>
+                <div class="kpi-delta" id="kpi-trend-arrow">--</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Volatility</div>
+                <div class="kpi-value" id="kpi-volatility">--</div>
+                <div class="kpi-delta" id="kpi-stability">--</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Range (24h)</div>
+                <div class="kpi-value" id="kpi-range" style="font-size:1.3rem; margin-top:10px;">--</div>
+                <div class="kpi-delta neutral" id="kpi-delta-val">--</div>
+            </div>
+        </div>
+
+        <!-- Main Chart -->
+        <div class="chart-wrapper">
+            <div class="loading-overlay" id="loader"><div class="spinner"></div></div>
+            <div style="width:100%; height:100%; position:relative;">
+                <canvas id="mainChart"></canvas>
+            </div>
+            <button class="reset-zoom" onclick="resetZoom()"><i class="fas fa-compress"></i> Reset</button>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="analysis-container">
+            <!-- Hourly Cycle Chart -->
+            <div class="card">
+                <div class="kpi-label">Daily Cycle (Hourly Average) <i class="far fa-clock"></i></div>
+                <div style="width:100%; height:100%; position:relative;">
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Stats List -->
+            <div class="card" style="overflow-y:auto;">
+                <div class="kpi-label" style="margin-bottom:8px">Data Matrix</div>
+                <div class="stat-row"><span>Peak Time</span> <span class="stat-val" id="stat-peak">--:--</span></div>
+                <div class="stat-row"><span>Low Time</span> <span class="stat-val" id="stat-low">--:--</span></div>
+                <div class="stat-row"><span>Mean</span> <span class="stat-val" id="stat-mean">--</span></div>
+                <div class="stat-row"><span>Std Dev</span> <span class="stat-val" id="stat-std">--</span></div>
+                <div class="stat-row"><span>Samples</span> <span class="stat-val" id="stat-count">0</span></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BASE_URL = 'https://data.b2.arizona.edu/Bio2Controls/TimeSeries.jsp?tab=';
+        
+        // --- 1. PIN CONFIGURATION (Based on your IDs) ---
+        // Ocean: DO(469), Salinity(467), TempC(463), pH(457)
+        const PINS_OCEAN = ["469", "467", "463", "457"]; 
+        // Mountain: Temp(562), Hum(561), CO2(560)
+        const PINS_MTN = ["562", "561", "560"];
+
+        let sensorMap = {};
+        let currentData = [];
+        let mainChart = null;
+        let hourlyChart = null;
+        let currentUnit = '';
+
+        // UI Refs
+        const ui = {
+            sensors: document.getElementById('sensors'),
+            filter: document.getElementById('filter'),
+            btn: document.getElementById('fetchBtn'),
+            loader: document.getElementById('loader'),
+            // KPIs
+            cur: document.getElementById('kpi-current'),
+            status: document.getElementById('kpi-status'),
+            trend: document.getElementById('kpi-trend'),
+            arrow: document.getElementById('kpi-trend-arrow'),
+            vol: document.getElementById('kpi-volatility'),
+            stab: document.getElementById('kpi-stability'),
+            range: document.getElementById('kpi-range'),
+            delta: document.getElementById('kpi-delta-val'),
+            // Stats
+            sPeak: document.getElementById('stat-peak'),
+            sLow: document.getElementById('stat-low'),
+            sMean: document.getElementById('stat-mean'),
+            sStd: document.getElementById('stat-std'),
+            sCount: document.getElementById('stat-count'),
+            // Config
+            sma: document.getElementById('toggleSMA'),
+            out: document.getElementById('toggleOutliers'),
+            per: document.getElementById('smaPeriod')
+        };
+
+        // --- Init ---
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('sensor_map.json')
+                .then(r => r.json())
+                .then(data => {
+                    sensorMap = data;
+                    renderSensorList();
+                    ui.filter.disabled = false;
+                    ui.sensors.disabled = false;
+                    ui.btn.disabled = false;
+                })
+                .catch(e => console.error("Map Load Error", e));
+        });
+
+        function renderSensorList(term = "") {
+            ui.sensors.innerHTML = '';
+            
+            let groupOcean = [];
+            let groupMtn = [];
+            let groupAll = [];
+
+            const keys = Object.keys(sensorMap).sort();
+            
+            keys.forEach(key => {
+                const item = sensorMap[key];
+                const fullText = item.desc ? `${item.desc} (${key})` : key;
+                
+                // Search Filter
+                if(term && !fullText.toLowerCase().includes(term.toLowerCase())) return;
+
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.text = fullText;
+                opt.dataset.unit = item.unit || "";
+                opt.dataset.desc = item.desc || "";
+                opt.dataset.key = key;
+
+                if(!item.id) return; // Skip empty IDs
+
+                // Sort into groups
+                if(PINS_OCEAN.includes(item.id)) groupOcean.push(opt);
+                else if(PINS_MTN.includes(item.id)) groupMtn.push(opt);
+                else groupAll.push(opt);
+            });
+
+            const addGroup = (lbl, opts) => {
+                if(!opts.length) return;
+                const grp = document.createElement('optgroup');
+                grp.label = lbl;
+                opts.forEach(o => grp.appendChild(o));
+                ui.sensors.appendChild(grp);
+            };
+
+            addGroup("★ OCEAN KEY DATA", groupOcean);
+            addGroup("★ MOUNTAIN TOWER", groupMtn);
+            addGroup("All Sensors", groupAll);
+        }
+
+        ui.filter.addEventListener('input', e => renderSensorList(e.target.value));
+
+        // --- Fetch & Process ---
+        ui.btn.addEventListener('click', async () => {
+            const id = ui.sensors.value;
+            if(!id) return;
+            
+            const opt = ui.sensors.options[ui.sensors.selectedIndex];
+            currentUnit = opt.dataset.unit;
+            const label = opt.dataset.desc || opt.dataset.key;
+
+            ui.loader.style.display = 'flex';
+            ui.btn.disabled = true;
+
+            try {
+                const res = await fetch(BASE_URL + id);
+                const txt = await res.text();
+                // Regex to find the ChartJS model in the JSP source
+                const match = txt.match(/window\.chart1_chartModel\s*=\s*({[\s\S]*?});/);
+                
+                if(!match) throw new Error("No data found");
+                
+                const raw = JSON.parse(match[1]);
+                const xArr = raw.layers[0].xValues;
+                const yArr = raw.layers[0].dataSets[0].data;
+                const offset = 62135596800; // Time offset (1AD -> 1970)
+
+                currentData = xArr.map((t, i) => {
+                    if(yArr[i] === null) return null;
+                    return { x: (t - offset) * 1000, y: yArr[i] };
+                }).filter(x => x);
+
+                if(!currentData.length) throw new Error("Empty Data");
+                
+                updateDashboard(label);
+
+            } catch(e) {
+                alert("Could not load data. " + e.message);
+            } finally {
+                ui.loader.style.display = 'none';
+                ui.btn.disabled = false;
+            }
+        });
+
+        [ui.sma, ui.out, ui.per].forEach(el => el.addEventListener('change', () => {
+            if(currentData.length) {
+                const opt = ui.sensors.options[ui.sensors.selectedIndex];
+                updateDashboard(opt.dataset.desc || opt.dataset.key);
+            }
+        }));
+
+        function updateDashboard(label) {
+            const y = currentData.map(d => d.y);
+            const n = y.length;
+            
+            // Stats
+            const min = Math.min(...y);
+            const max = Math.max(...y);
+            const sum = y.reduce((a,b)=>a+b,0);
+            const mean = sum/n;
+            const sqDiff = y.map(v => Math.pow(v-mean, 2));
+            const std = Math.sqrt(sqDiff.reduce((a,b)=>a+b,0)/n);
+
+            // Points
+            const last = currentData[n-1];
+            const peak = currentData.reduce((a,b) => b.y > a.y ? b : a);
+            const low = currentData.reduce((a,b) => b.y < a.y ? b : a);
+
+            // Trend & Volatility
+            const start = currentData[0].y;
+            const end = last.y;
+            const change = start !== 0 ? ((end-start)/Math.abs(start))*100 : 0;
+            const cv = mean !== 0 ? (std/Math.abs(mean))*100 : 0;
+
+            // DOM Updates
+            ui.cur.innerHTML = `${end.toFixed(2)}<span class="kpi-unit">${currentUnit}</span>`;
+            ui.status.textContent = "LIVE";
+            ui.status.className = "kpi-delta positive";
+
+            ui.trend.textContent = Math.abs(change).toFixed(1) + "%";
+            ui.arrow.innerHTML = change > 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+            ui.arrow.className = `kpi-delta ${change > 0 ? 'positive' : 'negative'}`;
+
+            ui.vol.textContent = cv.toFixed(1) + "%";
+            ui.stab.textContent = cv < 10 ? "Stable" : "Volatile";
+            ui.stab.className = `kpi-delta ${cv < 10 ? 'positive' : 'neutral'}`;
+
+            ui.range.textContent = `${min.toFixed(1)} - ${max.toFixed(1)}`;
+            ui.delta.textContent = `Δ ${(max-min).toFixed(1)}`;
+
+            ui.sMean.textContent = mean.toFixed(2);
+            ui.sStd.textContent = std.toFixed(3);
+            ui.sCount.textContent = n;
+            ui.sPeak.textContent = new Date(peak.x).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+            ui.sLow.textContent = new Date(low.x).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+            drawMainChart(label, currentData, mean, std);
+            drawHourlyChart(currentData);
+        }
+
+        function drawMainChart(label, data, mean, std) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            
+            // Gradient
+            const grad = ctx.createLinearGradient(0,0,0,400);
+            grad.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            grad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+            if(mainChart) mainChart.destroy();
+
+            const sets = [{
+                label: label,
+                data: data,
+                borderColor: '#3b82f6',
+                backgroundColor: grad,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.2
+            }];
+
+            if(ui.sma.checked) {
+                const p = parseInt(ui.per.value);
+                const sma = [];
+                for(let i=0; i<data.length; i++) {
+                    if(i < p) { sma.push({x:data[i].x, y:null}); continue; }
+                    let s=0; for(let j=0; j<p; j++) s+=data[i-j].y;
+                    sma.push({x:data[i].x, y:s/p});
+                }
+                sets.push({
+                    label: `SMA (${p})`,
+                    data: sma,
+                    borderColor: '#10b981',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false
+                });
+            }
+
+            if(ui.out.checked) {
+                const limit = std * 2;
+                const anoms = data.filter(d => Math.abs(d.y - mean) > limit);
+                sets.push({
+                    label: 'Anomalies',
+                    data: anoms,
+                    backgroundColor: '#ef4444',
+                    type: 'scatter',
+                    pointRadius: 4
+                });
+            }
+
+            Chart.defaults.color = '#6b7280';
+            Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: { datasets: sets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { type: 'time', time: { displayFormats: {hour:'HH:mm'} } },
+                        y: { title: {display:true, text:currentUnit} }
+                    },
+                    plugins: {
+                        zoom: { zoom: { wheel: {enabled:true}, mode:'x' }, pan: { enabled:true, mode:'x'} },
+                        legend: { labels: { color: 'white' } }
+                    }
+                }
+            });
+        }
+
+        // --- New Visualization: Hourly Cycle ---
+        function drawHourlyChart(data) {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            if(hourlyChart) hourlyChart.destroy();
+
+            // Aggregation Buckets (0-23 hours)
+            const sums = new Array(24).fill(0);
+            const counts = new Array(24).fill(0);
+
+            data.forEach(pt => {
+                const h = new Date(pt.x).getHours();
+                sums[h] += pt.y;
+                counts[h]++;
+            });
+
+            const avgs = sums.map((s, i) => counts[i] ? s/counts[i] : 0);
+            const labels = Array.from({length:24}, (_,i) => `${i}:00`);
+
+            hourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Avg Value per Hour',
+                        data: avgs,
+                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { font: {size:9} }, grid: {display:false} },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        function resetZoom() { if(mainChart) mainChart.resetZoom(); }
+    </script>
+</body>
+</html>

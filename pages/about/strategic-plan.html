@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Plan | Biosphere 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        /* --- YOUR ORIGINAL STYLES --- */
+        .doc-layout {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr; /* Adjusted slightly to give graph space */
+            gap: 4rem;
+            margin-top: 4rem;
+            margin-bottom: 6rem;
+        }
+        .doc-content h2 {
+            font-family: var(--font-heading);
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--grid-line);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
+        }
+        .doc-content h2:first-child { margin-top: 0; }
+        .doc-content p {
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            text-align: justify;
+        }
+        .mission-box {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid var(--accent-secondary);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .download-btn {
+            display: inline-block;
+            background: var(--accent-secondary);
+            color: white;
+            padding: 1rem 2rem;
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-top: 2rem;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        .download-btn:hover { background: #d9062a; }
+        
+        .sidebar-nav {
+            border-top: 2px solid var(--text-muted);
+            padding-top: 1rem;
+        }
+        .sidebar-nav h4 { color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; margin-bottom: 1rem;}
+        .sidebar-nav a { display: block; padding: 0.5rem 0; color: white; border-bottom: 1px solid var(--grid-line); }
+        .sidebar-nav a:hover { color: var(--accent-primary); padding-left: 5px; }
+
+        /* --- NEW INTERACTIVE GRAPH STYLES --- */
+        :root {
+            --c-green: #558C68;
+            --c-pink: #9D3173;
+            --c-blue: #007BC3;
+            --c-orange: #C66228;
+            --c-yellow: #BCA308;
+        }
+
+        .pillars-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            margin-bottom: 2rem;
+            font-family: var(--font-heading);
+        }
+
+        /* SVG Background Layer */
+        .pillars-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .pillars-connections line {
+            stroke-width: 6px;
+            opacity: 0.7;
+            stroke-linecap: round;
+        }
+
+        /* Nodes */
+        .pillar-node {
+            position: absolute;
+            z-index: 2;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27), box-shadow 0.3s ease;
+            cursor: pointer;
+            width: 28%; 
+            height: 28%;
+            box-sizing: border-box;
+        }
+
+        .pillar-node:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Node Positions & Colors */
+        .node-research { background-color: var(--c-green); top: 0%; left: 36%; }
+        .node-solutions { background-color: var(--c-pink); top: 25%; left: 72%; }
+        .node-leaders { background-color: var(--c-blue); top: 65%; left: 70%; }
+        .node-networks { background-color: var(--c-orange); top: 80%; left: 36%; }
+        .node-arid { background-color: var(--c-yellow); top: 45%; left: 0%; }
+
+        /* Icon & Text */
+        .pillar-icon { width: 24px; height: 24px; margin-bottom: 5px; fill: white; }
+        .pillar-title { font-weight: 700; font-size: 0.85rem; line-height: 1.1; margin-bottom: 2px; }
+        .pillar-desc { font-family: var(--font-body); font-size: 0.55rem; line-height: 1.1; opacity: 0.9; display: block; }
+
+        @media(max-width: 900px) {
+            .doc-layout { grid-template-columns: 1fr; }
+            
+            /* Convert Graph to List on Mobile */
+            .pillars-container { display: flex; flex-direction: column; gap: 1rem; aspect-ratio: auto; height: auto; }
+            .pillars-connections { display: none; }
+            .pillar-node {
+                position: relative; width: 100%; height: auto; top: auto !important; left: auto !important;
+                border-radius: 8px; flex-direction: row; text-align: left; justify-content: flex-start; padding: 1.5rem;
+            }
+            .pillar-icon { width: 40px; height: 40px; margin-bottom: 0; margin-right: 1rem; }
+            .pillar-title { font-size: 1.1rem; }
+            .pillar-desc { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER CONTAINER -->
+    <div id="global-header"></div>
+
+    <!-- 2. UNIQUE CONTENT -->
+    <header class="page-hero-small" style="padding: 6rem 0 3rem; border-bottom: 1px solid var(--grid-line);">
+        <div class="container">
+            <div class="hero-label">CLASSIFICATION: STRATEGIC</div>
+            <h1 class="hero-title" style="font-size: 3rem;">RESEARCH STRATEGIC PLAN</h1>
+        </div>
+    </header>
+
+    <div class="container doc-layout">
+        <div class="doc-content">
+            
+            <h2>EXECUTIVE SUMMARY</h2>
+            <p>Biosphere 2 (B2), a campus of the University of Arizona (UA), engages in world-class environmental research, education, and entrepreneurship leading to solutions for humanity’s grand challenges of climate change, biodiversity loss and sustainable development, on Earth and beyond.</p> 
+            
+            <p>The core research facility of the B2 campus is the world’s largest indoor controlled environment for ecological and climate change research across multiple biomes. The campus also boasts a growing number of specialized research spaces, including facilities dedicated to development of co-located food and photovoltaic energy production and a human-habitat analog for the Moon and Mars.</p>
+            
+            <p>Over the last decade, B2 has built its fundamental research and core educational programs and expanded its portfolio beyond these efforts. To enhance our impact still further, our strategic plan for the next five years rests on five pillars, closely linked to the UA strategic plan: Sustainability research, Resilience solutions, Our region, Tomorrow’s leaders, Networks.</p>
+
+            <div class="mission-box">
+                <h3 style="color:white; font-family:var(--font-heading); margin-bottom:1rem;">MISSION DIRECTIVE</h3>
+                <p style="margin-bottom:0;">Biosphere 2 advances our understanding of natural and human-made ecosystems through integrated research and development of scalable interventions that increase the resilience and sustainability of Earth systems and human societies.</p>
+            </div>
+
+            <div class="mission-box">
+                <h3 style="color:white; font-family:var(--font-heading); margin-bottom:1rem;">VISION 2030</h3>
+                <p style="margin-bottom:0;">By 2030, Biosphere 2 will be a global center for resilience solutions to humanity’s grand challenges of climate change, biodiversity loss, and sustainable development. We will be a collaborative and inclusive hub in a network that provides education, ideas, research and innovations.</p>
+            </div>
+
+            <a href="https://biosphere2.org/sites/default/files/2023-01/Biosphere%202%20Strategic%20Research%20Plan%20final%202023.pdf" class="download-btn">DOWNLOAD FULL SCHEMATIC (PDF)</a>
+        </div>
+
+        <aside class="sidebar">
+            
+            <!-- NEW INTERACTIVE GRAPH START -->
+            <div class="pillars-container">
+                
+                <!-- SVG Connections (The Mesh) -->
+                <svg class="pillars-connections" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <defs>
+                        <!-- Gradients to blend node colors -->
+                        <linearGradient id="g-green-pink" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#558C68"/><stop offset="100%" stop-color="#9D3173"/></linearGradient>
+                        <linearGradient id="g-green-blue" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#558C68"/><stop offset="100%" stop-color="#007BC3"/></linearGradient>
+                        <linearGradient id="g-green-orange" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#558C68"/><stop offset="100%" stop-color="#C66228"/></linearGradient>
+                        <linearGradient id="g-green-yellow" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#558C68"/><stop offset="100%" stop-color="#BCA308"/></linearGradient>
+                        <linearGradient id="g-pink-blue" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#9D3173"/><stop offset="100%" stop-color="#007BC3"/></linearGradient>
+                        <linearGradient id="g-pink-orange" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#9D3173"/><stop offset="100%" stop-color="#C66228"/></linearGradient>
+                        <linearGradient id="g-pink-yellow" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#9D3173"/><stop offset="100%" stop-color="#BCA308"/></linearGradient>
+                        <linearGradient id="g-blue-orange" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#007BC3"/><stop offset="100%" stop-color="#C66228"/></linearGradient>
+                        <linearGradient id="g-blue-yellow" x1="100%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#007BC3"/><stop offset="100%" stop-color="#BCA308"/></linearGradient>
+                        <linearGradient id="g-orange-yellow" x1="100%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#C66228"/><stop offset="100%" stop-color="#BCA308"/></linearGradient>
+                    </defs>
+
+                    <!-- Coords correspond to center of nodes (approx) -->
+                    <!-- Green(50,14), Pink(86,39), Blue(84,79), Orange(50,94), Yellow(14,59) -->
+
+                    <line x1="50" y1="14" x2="86" y2="39" stroke="url(#g-green-pink)" />
+                    <line x1="50" y1="14" x2="84" y2="79" stroke="url(#g-green-blue)" />
+                    <line x1="50" y1="14" x2="50" y2="94" stroke="url(#g-green-orange)" />
+                    <line x1="50" y1="14" x2="14" y2="59" stroke="url(#g-green-yellow)" />
+
+                    <line x1="86" y1="39" x2="84" y2="79" stroke="url(#g-pink-blue)" />
+                    <line x1="86" y1="39" x2="50" y2="94" stroke="url(#g-pink-orange)" />
+                    <line x1="86" y1="39" x2="14" y2="59" stroke="url(#g-pink-yellow)" />
+
+                    <line x1="84" y1="79" x2="50" y2="94" stroke="url(#g-blue-orange)" />
+                    <line x1="84" y1="79" x2="14" y2="59" stroke="url(#g-blue-yellow)" />
+
+                    <line x1="50" y1="94" x2="14" y2="59" stroke="url(#g-orange-yellow)" />
+                </svg>
+
+                <!-- NODE 1: SUSTAINABILITY (Green) -->
+                <div class="pillar-node node-research">
+                    <svg class="pillar-icon" viewBox="0 0 24 24"><path d="M19.78 18.23l-5.02-9.53V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4.7l-5.02 9.53A2 2 0 0 0 5.5 21h12.5a2 2 0 0 0 1.78-2.77zM16 19H7.5l4-7.6V5h2v6.4z"/></svg>
+                    <div class="pillar-text-wrap">
+                        <div class="pillar-title">Sustainability Research</div>
+                        <span class="pillar-desc">Advancing the science of sustainability and resilience</span>
+                    </div>
+                </div>
+
+                <!-- NODE 2: RESILIENCE (Pink) -->
+                <div class="pillar-node node-solutions">
+                    <svg class="pillar-icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm9 2.8V7.2a2 2 0 0 0-1-1.73l-1.46-.5a9.93 9.93 0 0 0-1.2-2.1l.66-1.4a2 2 0 0 0-1.46-2.6l-2.6-.6a1.95 1.95 0 0 0-2.22 1.08L11 1.03a10.08 10.08 0 0 0-2.38 0l-.73-1.67A2 2 0 0 0 5.67-1.6L3.06-.98A2 2 0 0 0 1.6 1.61l.66 1.4a10.27 10.27 0 0 0-1.2 2.1l-1.46.5A2 2 0 0 0-1.4 7.2v9.6a2 2 0 0 0 1 1.73l1.46.5c.34.75.75 1.45 1.2 2.1l-.66 1.4a2 2 0 0 0 1.46 2.6l2.6.6a2 2 0 0 0 2.22-1.08l.73-1.66a9.93 9.93 0 0 0 2.38 0l.73 1.67a2 2 0 0 0 2.22 1.08l2.6-.6a2 2 0 0 0 1.46-2.6l-.66-1.4a10.27 10.27 0 0 0 1.2-2.1l1.46-.5a2 2 0 0 0 1-1.73z"/></svg>
+                    <div class="pillar-text-wrap">
+                        <div class="pillar-title">Resilience Solutions</div>
+                        <span class="pillar-desc">Translating science into innovative solutions</span>
+                    </div>
+                </div>
+
+                <!-- NODE 3: LEADERS (Blue) -->
+                <div class="pillar-node node-leaders">
+                    <svg class="pillar-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <div class="pillar-text-wrap">
+                        <div class="pillar-title">Tomorrow's Leaders</div>
+                        <span class="pillar-desc">Preparing the next generation of resilience leaders</span>
+                    </div>
+                </div>
+
+                <!-- NODE 4: NETWORKS (Orange) -->
+                <div class="pillar-node node-networks">
+                    <svg class="pillar-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    <div class="pillar-text-wrap">
+                        <div class="pillar-title">International Networks</div>
+                        <span class="pillar-desc">Deepening connections to global networks</span>
+                    </div>
+                </div>
+
+                <!-- NODE 5: ARID LANDS (Yellow) -->
+                <div class="pillar-node node-arid">
+                    <svg class="pillar-icon" viewBox="0 0 24 24"><path d="M20 8h-2V6a2 2 0 0 0-2-2h-2v1h2v3h-2v9h2v-2h2v2a2 2 0 0 0 2 2h2v-9a2 2 0 0 0-2-2zM6 15v2H4v-2h2m0-3H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v5h4V5h-4v7z"/></svg>
+                    <div class="pillar-text-wrap">
+                        <div class="pillar-title">Arid Lands</div>
+                        <span class="pillar-desc">Using regional expertise to advance resilience</span>
+                    </div>
+                </div>
+
+            </div>
+            <!-- INTERACTIVE GRAPH END -->
+            
+            <div class="sidebar-nav">
+                <h4>RELATED PROTOCOLS</h4>
+                <a href="#">Research Strategic Pillars</a>
+                <a href="#">Research Initiatives</a>
+                <a href="#">Systems Data</a>
+                <a href="#">Publications</a>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 3. FOOTER CONTAINER -->
+    <div id="global-footer"></div>
+
+    <!-- 4. LOAD SCRIPTS -->
+    <script src="../../js/components.js"></script>
+    <script>
+        // Initialize with depth 2 (because we are in pages/about/)
+        new B2Interface(2);
+    </script>
+</body>
+</html>

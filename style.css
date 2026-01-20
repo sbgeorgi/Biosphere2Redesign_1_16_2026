@@ -1248,3 +1248,27 @@ img {
     
     .slider-card { min-width: 280px; max-width: 280px; }
 }
+
+/* ==========================================================================
+   FIX: CALENDAR MOBILE OVERFLOW
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* 1. Reduce the white container's outer padding to save edge space */
+    .calendar-wrapper {
+        padding: 20px 10px; 
+        overflow-x: auto; /* Adds a scrollbar if the screen is extremely small (e.g. Galaxy Fold) */
+    }
+
+    /* 2. Drastically reduce cell padding (was 15px) to fit 7 columns */
+    .cal-table th, 
+    .cal-table td {
+        padding: 10px 2px; /* 2px side padding fits 7 cols comfortably on mobile */
+        font-size: 0.85rem; /* Slightly smaller text for better fit */
+    }
+
+    /* 3. Ensure the table header (month/arrows) aligns correctly */
+    .cal-header {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+}

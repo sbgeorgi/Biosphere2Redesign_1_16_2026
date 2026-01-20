@@ -1,4 +1,14 @@
 /* ==========================================================================
+   0. FONT IMPORTS (GOOGLE FONTS SUBSTITUTES FOR MILO/MILO SERIF)
+   ========================================================================== */
+/* 
+   - Red Hat Display/Text replaces 'Milo' (Geometric Sans)
+   - Source Serif 4 replaces 'Milo Serif'
+   - Source Code Pro for technical data 
+*/
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Red+Hat+Text:ital,wght@0,300..700;1,300..700&family=Source+Code+Pro:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+
+/* ==========================================================================
    1. UA BRAND PALETTE & VARIABLES (OFFICIAL)
    ========================================================================== */
 :root {
@@ -24,11 +34,13 @@
     --ua-river: #007D84;      
     --ua-mesa: #A95C42;       
 
-    /* --- TYPOGRAPHY --- */
-    --font-heading: 'Space Grotesk', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-display-serif: 'Playfair Display', serif;
+    /* --- TYPOGRAPHY (REVISED FOR BRAND COMPLIANCE) --- */
+    /* Mapped to Red Hat Display/Text to simulate 'Milo' */
+    --font-heading: 'Red Hat Display', sans-serif;
+    --font-body: 'Red Hat Text', sans-serif;
+    /* Mapped to Source Serif 4 to simulate 'Milo Serif' */
+    --font-serif: 'Source Serif 4', serif; 
+    --font-mono: 'Source Code Pro', monospace;
 
     /* --- LAYOUT --- */
     --spacing-container: 4vw;
@@ -36,7 +48,7 @@
     --radius-pill: 999px;
     --radius-card: 24px;
     
-    /* --- SYSTEM ACCENT (Mapped to Brand Complementary) --- */
+    /* --- SYSTEM ACCENT --- */
     --accent-color: var(--ua-oasis); 
 
     /* --- ANIMATION --- */
@@ -62,6 +74,7 @@ body {
     background-color: var(--ua-white);
     color: var(--ua-blue);
     font-family: var(--font-body);
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
     line-height: 1.5;
@@ -83,26 +96,27 @@ img {
 /* ==========================================================================
    3. TYPOGRAPHY UTILITIES
    ========================================================================== */
+/* The massive, bold headers seen in "YOUR GOALS" posters */
 .display-heading {
     font-family: var(--font-heading);
-    font-weight: 700;
+    font-weight: 900; /* Extra bold/Black for impact */
     font-size: clamp(3.5rem, 7vw, 6rem);
-    line-height: 0.95;
-    letter-spacing: -0.03em;
+    line-height: 0.9;
+    letter-spacing: -0.02em; /* Tight tracking for heavy fonts */
     margin-bottom: 2rem;
     color: var(--ua-midnight);
     text-transform: uppercase;
 }
 
+/* Labels like "BEST VALUE COLLEGE" */
 .section-label {
     display: block;
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-family: var(--font-heading); /* Switch to Heading font for labels */
+    font-size: 0.9rem;
+    font-weight: 800; /* Heavy weight */
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em; /* Wide tracking */
     margin-bottom: 1.5rem;
-    /* Red is Primary, safe for text */
     color: var(--ua-red); 
     display: flex;
     align-items: center;
@@ -114,17 +128,22 @@ img {
     display: block;
     width: 30px;
     height: 4px; 
-    /* Highlights allowed for graphic elements */
     background-color: var(--ua-sky); 
 }
 
 .body-text {
+    font-family: var(--font-body);
     font-size: 1.25rem;
     line-height: 1.6;
     color: var(--ua-blue);
     font-weight: 400;
     max-width: 540px;
     margin-bottom: 2.5rem;
+}
+
+/* Utility for the Serif style seen in Law School ads */
+.serif-mode {
+    font-family: var(--font-serif) !important;
 }
 
 .text-white { color: var(--ua-white) !important; }
@@ -145,7 +164,6 @@ img {
     align-items: center;
     padding: 0 var(--spacing-container);
     z-index: 1000;
-    /* Using Arizona Blue RGB with opacity */
     background: rgba(12, 35, 75, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -154,9 +172,10 @@ img {
 
 .brand-logo {
     font-family: var(--font-heading);
-    font-weight: 800;
+    font-weight: 900;
     font-size: 1.5rem;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
 }
 
 .brand-logo .highlight { color: var(--ua-sky); }
@@ -164,10 +183,10 @@ img {
 .nav-right { display: flex; align-items: center; gap: 1rem; }
 
 .nav-item {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-family: var(--font-heading); /* Navigation is usually Sans/Heading font */
+    font-size: 0.85rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     cursor: pointer;
     transition: 0.2s;
@@ -175,9 +194,11 @@ img {
 
 .btn-solid {
     background: rgba(255, 255, 255, 0.1);
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 4px;
     color: var(--ua-white);
+    font-weight: 800;
+    letter-spacing: 0.05em;
 }
 
 .btn-solid:hover { background: var(--ua-red); color: var(--ua-white); }
@@ -185,9 +206,12 @@ img {
 .highlight-btn {
     border: 1px solid rgba(255,255,255,0.2);
     background: rgba(255,255,255,0.1);
-    padding: 8px 16px;
+    padding: 10px 20px;
     color: var(--ua-white);
     border-radius: 4px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 .highlight-btn:hover { background: var(--ua-sky); color: var(--ua-blue); border-color: var(--ua-sky); }
@@ -218,7 +242,6 @@ img {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    /* Gradient using Midnight RGB */
     background: linear-gradient(90deg, 
         rgba(0, 28, 72, 0.95) 0%, 
         rgba(0, 28, 72, 0.5) 60%, 
@@ -240,7 +263,6 @@ img {
 .hero-status {
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    /* Swapped Sky for Oasis (Complementary) for better text compliance */
     color: var(--ua-oasis);
     margin-bottom: 1rem;
     letter-spacing: 0.1em;
@@ -250,14 +272,13 @@ img {
 
 .hero-title {
     font-family: var(--font-heading);
-    font-weight: 800;
+    font-weight: 900; /* Maximum weight matching "YOUR GOALS" poster */
     font-size: clamp(4.5rem, 11vw, 9rem);
     line-height: 0.85;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
     color: var(--ua-white);
     margin: 0 0 2rem 0;
     text-transform: uppercase;
-    /* Shadow using Red */
     text-shadow: 4px 4px 0 rgba(171, 5, 32, 0.8);
 }
 
@@ -273,16 +294,18 @@ img {
     font-family: var(--font-heading);
     font-size: 2.5rem;
     color: var(--ua-white);
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
 }
 
 .stat-lbl {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    /* Using Azurite/Oasis for text instead of highlight colors */
+    font-family: var(--font-heading); /* Changed from mono to heading for legibility */
+    font-size: 0.75rem;
+    font-weight: 700;
     color: var(--ua-oasis);
     margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* Hero Cards */
@@ -303,30 +326,30 @@ img {
     padding: 1.5rem;
     transform: translateX(10%);
     transition: transform 0.4s var(--ease-lively);
-    /* Border is graphic element, Oasis is safe */
     border-left: 5px solid var(--ua-oasis); 
 }
 
-/* Leaf is allowed as graphic accent */
 .hero-card:nth-child(2) { border-left-color: var(--ua-leaf); }
 .hero-card:hover { transform: translateX(0); }
 
 .card-label {
     display: block;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
     color: var(--ua-blue);
-    letter-spacing: 0.15em;
+    letter-spacing: 0.1em;
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
 .hero-card h3 {
     font-family: var(--font-heading);
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--ua-midnight);
     margin: 0;
+    line-height: 1.2;
 }
 
 .hero-scroll-indicator {
@@ -335,15 +358,18 @@ img {
     left: 4rem;   
     z-index: 3;
     color: var(--ua-white);
-    font-family: var(--font-mono);
+    font-family: var(--font-heading);
     font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 /* ==========================================================================
-   PORTED V2 SECTION: 3-COL SERVICES & TICKER
+   PORTED V2 SECTION: 3-COL SERVICES
    ========================================================================== */
 .services-3col {
     display: flex;
@@ -368,7 +394,7 @@ img {
 .col-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 28, 72, 0.6); /* Midnight */
+    background: rgba(0, 28, 72, 0.6); 
     transition: 0.3s;
 }
 
@@ -387,7 +413,8 @@ img {
     margin-bottom: 10px; 
     color: var(--ua-white);
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 800;
+    line-height: 1.1;
 }
 
 .col-content p { 
@@ -397,24 +424,23 @@ img {
     transition: 0.3s; 
     font-size: 1rem;
     line-height: 1.5;
-    color: var(--ua-cool-gray); /* Brand Neutral */
+    color: var(--ua-cool-gray); 
     font-family: var(--font-body);
 }
 
 .read-more-btn {
     display: inline-block;
     margin-top: 15px;
-    /* Changed Sky to Oasis for text compliance */
     color: var(--ua-oasis); 
-    font-weight: 600;
-    font-family: var(--font-mono);
+    font-weight: 700;
+    font-family: var(--font-heading);
     opacity: 0;
     transform: translateY(20px);
     transition: 0.3s;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* Hover Interaction */
 .service-col:hover { flex: 1.5; }
 .service-col:hover .col-overlay { background: rgba(0, 28, 72, 0.85); }
 .service-col:hover .col-content { bottom: 60px; }
@@ -500,14 +526,13 @@ img {
     display: flex;
     align-items: center;
     padding: 0 var(--spacing-container);
-    background-color: var(--ua-oasis); /* Complimentary background allowed */
+    background-color: var(--ua-oasis); 
     z-index: 5;
     color: var(--ua-white);
 }
 
 .sticky-content .display-heading { color: var(--ua-white); }
-.sticky-content .body-text { color: rgba(255,255,255,0.9); }
-/* Sky allowed here as it's a graphical label accent, not body text */
+.sticky-content .body-text { color: rgba(255,255,255,0.9); font-weight: 500; }
 .sticky-content .section-label { color: var(--ua-midnight); }
 .sticky-content .section-label::before { background-color: var(--ua-white); }
 
@@ -533,7 +558,7 @@ img {
 .img-frame {
     width: 100%;
     border: 1px solid var(--ua-midnight);
-    box-shadow: 15px 15px 0px var(--ua-sky); /* Highlight allowed in graphics */
+    box-shadow: 15px 15px 0px var(--ua-sky); 
     transition: transform 0.4s var(--ease-lively), box-shadow 0.4s ease;
     background: var(--ua-midnight);
 }
@@ -568,7 +593,7 @@ img {
 }
 
 .tech-spec span:first-child {
-    color: var(--ua-sky); /* Allowed as graphical accent/spec label */
+    color: var(--ua-sky); 
     font-weight: 700;
     font-size: 0.8rem;
     margin-bottom: 4px;
@@ -577,7 +602,7 @@ img {
 .btn-underline {
     position: relative;
     font-family: var(--font-heading);
-    font-weight: 700;
+    font-weight: 800;
     font-size: 1.1rem;
     text-transform: uppercase;
     padding: 12px 24px;
@@ -586,10 +611,11 @@ img {
     display: inline-block;
     transition: all 0.3s ease;
     border: 1px solid var(--ua-midnight);
+    letter-spacing: 0.05em;
 }
 
 .btn-underline:hover {
-    background: var(--ua-sky); /* Highlight background allowed */
+    background: var(--ua-sky);
     transform: translateY(-2px);
     border-color: var(--ua-sky);
 }
@@ -599,7 +625,7 @@ img {
    7. LIVE SYSTEM INTELLIGENCE
    ========================================================================== */
 .section-padding { padding: 4rem 0; }
-.bg-light-theme { background-color: var(--ua-warm-gray); } /* Brand Neutral */
+.bg-light-theme { background-color: var(--ua-warm-gray); } 
 
 .integrated-container {
     padding: 0 var(--spacing-container);
@@ -635,6 +661,7 @@ img {
     cursor: pointer;
     transition: 0.3s;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 .tab-btn.active {
     background: var(--ua-white);
@@ -684,7 +711,9 @@ img {
     justify-content: space-between;
     align-items: baseline;
 }
-.data-header h3 { font-family: var(--font-display-serif); font-size: 3rem; color: var(--ua-midnight); margin: 0; }
+
+/* Replaced Display Serif with Source Serif (Milo Serif Equivalent) */
+.data-header h3 { font-family: var(--font-serif); font-weight: 700; font-size: 3rem; color: var(--ua-midnight); margin: 0; }
 #last-update { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ua-blue); text-transform: uppercase; }
 
 .data-content-wrapper {
@@ -715,12 +744,13 @@ img {
 }
 
 .finding-box {
-    /* Mapped to Oasis (Complementary) instead of non-compliant Purple */
     border-left: 4px solid var(--ua-oasis);
     padding-left: 25px;
     margin-bottom: 40px;
     font-size: 1rem;
     font-style: italic;
+    /* Use Serif for quotes/findings per guidelines */
+    font-family: var(--font-serif);
     color: var(--ua-midnight);
     background: var(--ua-cool-gray);
     padding: 20px 25px;
@@ -751,8 +781,8 @@ img {
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-.m-label { display: block; font-family: var(--font-heading); font-size: 0.7rem; text-transform: uppercase; color: var(--ua-blue); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 5px; }
-.m-val { display: block; font-size: 1.6rem; font-weight: 700; color: var(--ua-midnight); font-family: var(--font-heading); }
+.m-label { display: block; font-family: var(--font-heading); font-size: 0.7rem; text-transform: uppercase; color: var(--ua-blue); font-weight: 800; letter-spacing: 0.05em; margin-bottom: 5px; }
+.m-val { display: block; font-size: 1.6rem; font-weight: 800; color: var(--ua-midnight); font-family: var(--font-heading); }
 .m-val small { font-size: 0.75rem; color: var(--ua-azurite); font-weight: 400; font-family: var(--font-mono); display: block; margin-top: -2px;}
 
 /* Chart Area */
@@ -774,7 +804,7 @@ img {
     font-size: 0.8rem;
     color: var(--ua-blue);
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 700;
     font-family: var(--font-heading);
 }
 
@@ -793,7 +823,7 @@ img {
     font-weight: 700;
     cursor: pointer;
     color: var(--ua-blue);
-    font-family: var(--font-mono);
+    font-family: var(--font-heading);
 }
 .toggle-opt.active { background: white; color: var(--ua-midnight); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
@@ -804,13 +834,14 @@ img {
     display: inline-flex;
     align-items: center;
     color: var(--ua-blue);
-    font-weight: 700;
+    font-weight: 800;
     font-family: var(--font-heading);
     font-size: 1rem;
     text-transform: uppercase;
     padding-bottom: 2px;
     border-bottom: 2px solid rgba(12, 35, 75, 0.2);
     transition: 0.3s;
+    letter-spacing: 0.05em;
 }
 .btn-secondary-circle:hover { border-color: var(--ua-blue); color: var(--ua-red); }
 .arrow-icon { margin-left: 8px; }
@@ -868,11 +899,12 @@ img {
     border: 1px solid var(--ua-midnight);
     color: var(--ua-midnight);
     padding: 12px 24px;
-    font-family: var(--font-mono);
+    font-family: var(--font-heading);
     text-transform: uppercase;
     font-weight: 700;
     margin-top: 1rem;
     transition: 0.3s;
+    letter-spacing: 0.05em;
 }
 .ghost-btn-dark:hover { background: var(--ua-midnight); color: white; }
 
@@ -883,12 +915,12 @@ img {
     background: white;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
-.cal-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 20px; font-size: 1.1rem; font-family: var(--font-heading); color: var(--ua-midnight); }
+.cal-header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 20px; font-size: 1.1rem; font-family: var(--font-heading); color: var(--ua-midnight); text-transform: uppercase; }
 .cal-nav i { margin-left: 15px; cursor: pointer; color: var(--ua-blue); }
 .cal-nav i:hover { color: var(--ua-red); }
 
-.cal-table { width: 100%; text-align: center; border-collapse: collapse; font-family: var(--font-mono); }
-.cal-table th { padding: 15px; color: var(--ua-blue); font-weight: 400; font-size: 0.8rem; }
+.cal-table { width: 100%; text-align: center; border-collapse: collapse; font-family: var(--font-body); }
+.cal-table th { padding: 15px; color: var(--ua-blue); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; font-family: var(--font-heading); }
 .cal-table td { padding: 20px; border: 1px solid var(--ua-cool-gray); cursor: pointer; transition: 0.3s; color: var(--ua-blue); }
 .cal-table td.mute { color: var(--ua-cool-gray); }
 .cal-table td.today { background: var(--ua-warm-gray); font-weight: 700; color: var(--ua-red); }
@@ -919,6 +951,7 @@ img {
     transition: 0.3s;
     font-family: var(--font-heading);
     text-transform: uppercase;
+    font-weight: 700;
 }
 .skill-tab-btn.active { color: white; border-bottom: 2px solid var(--ua-oasis); }
 .skill-tab-btn:hover { color: white; }
@@ -943,8 +976,9 @@ img {
 .skill-heading {
     font-family: var(--font-heading);
     font-size: 2.2rem;
-    color: var(--ua-oasis); /* Complementary color for heading text */
+    color: var(--ua-oasis); 
     margin-bottom: 1.5rem;
+    font-weight: 800;
 }
 
 .skill-desc {
@@ -964,11 +998,12 @@ img {
 }
 
 .meta-label {
-    font-family: var(--font-mono);
-    color: var(--ua-sky); /* Allowed as graphic label */
+    font-family: var(--font-heading);
+    color: var(--ua-sky); 
     font-size: 0.75rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    font-weight: 700;
 }
 
 .meta-val {
@@ -979,7 +1014,7 @@ img {
 }
 
 .skill-row { margin-bottom: 25px; }
-.skill-name { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; font-family: var(--font-body); color: var(--ua-cool-gray); }
+.skill-name { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; font-family: var(--font-heading); color: var(--ua-cool-gray); text-transform: uppercase; }
 .progress-track { background: rgba(255,255,255,0.1); height: 6px; overflow: hidden; border-radius: 99px; }
 .progress-bar {
     height: 100%;
@@ -1019,12 +1054,13 @@ img {
 }
 
 .card-logo {
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     letter-spacing: 1px;
-    color: var(--ua-blue); /* Text color fixed */
+    color: var(--ua-blue); 
     margin-bottom: 20px;
-    font-family: var(--font-mono);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
 }
 
 .slider-card img {
@@ -1035,11 +1071,12 @@ img {
     object-fit: cover;
 }
 
+/* Stories often use Serif for elegance (like Law example) */
 .slider-card h4 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 600;
     color: var(--ua-midnight);
-    font-family: var(--font-display-serif); 
+    font-family: var(--font-serif); 
     line-height: 1.3;
 }
 
@@ -1069,7 +1106,7 @@ img {
 .find-us-info { 
     flex: 1; 
     padding: 60px; 
-    background: var(--ua-warm-gray); /* Brand Neutral */
+    background: var(--ua-warm-gray); 
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
@@ -1101,6 +1138,7 @@ img {
     color: var(--ua-red);
     margin-bottom: 10px;
     text-transform: uppercase;
+    font-weight: 800;
 }
 
 .cta-mini-text {
@@ -1118,8 +1156,9 @@ img {
 
 .link-simple {
     color: var(--ua-blue);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: underline;
+    font-family: var(--font-heading);
 }
 
 /* Footer */
@@ -1127,19 +1166,19 @@ img {
     background-color: var(--ua-white);
     color: var(--ua-blue);
     padding: 4rem var(--spacing-container) 1rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.8rem;
     border-top: 1px solid var(--ua-cool-gray);
 }
 
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2rem; margin-bottom: 4rem; }
-.footer-col h4 { color: var(--ua-midnight); margin-bottom: 1.5rem; font-family: var(--font-heading); }
+.footer-col h4 { color: var(--ua-midnight); margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: 800; text-transform: uppercase; }
 .footer-col ul { list-style: none; }
 .footer-col li { margin-bottom: 0.5rem; }
 .footer-col a:hover { color: var(--ua-red); }
 
 .footer-form { display: flex; border: 1px solid var(--ua-cool-gray); }
-.footer-form input { background: none; border: none; color: var(--ua-blue); padding: 10px; flex: 1; font-family: var(--font-mono); }
+.footer-form input { background: none; border: none; color: var(--ua-blue); padding: 10px; flex: 1; font-family: var(--font-body); }
 .footer-form button { background: var(--ua-leaf); border: none; color: white; padding: 0 15px; cursor: pointer; }
 
 .footer-bottom { border-top: 1px solid var(--ua-cool-gray); padding-top: 1rem; display: flex; justify-content: space-between; color: var(--ua-blue); }

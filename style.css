@@ -563,14 +563,15 @@ img {
 
 
 /* ==========================================================================
-   7. LIVE SYSTEM INTELLIGENCE (UPDATED WIDESCREEN LAYOUT)
+   7. LIVE SYSTEM INTELLIGENCE (ULTRA-WIDE LAYOUT)
    ========================================================================== */
-.section-padding { padding: 6rem 0; }
+.section-padding { padding: 4rem 0; }
 .bg-light-theme { background-color: #F4F6F8; }
 
 .integrated-container {
     padding: 0 var(--spacing-container);
-    max-width: 1400px; /* Increased width to utilize horizontal space */
+    /* CHANGED: Use 90% of screen width to stop cramping */
+    max-width: 90vw; 
     margin: 0 auto;
 }
 
@@ -593,11 +594,11 @@ img {
 .tab-btn {
     border: none;
     background: transparent;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: var(--radius-pill);
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #666; 
     cursor: pointer;
     transition: 0.3s;
@@ -614,8 +615,8 @@ img {
     border-radius: var(--radius-card);
     box-shadow: 0 20px 60px rgba(0,0,0,0.08); 
     display: grid;
-    /* CHANGED: Image is smaller (350px fixed), Data takes remaining space */
-    grid-template-columns: 350px 1fr; 
+    /* CHANGED: Image takes 25%, Data takes 75% */
+    grid-template-columns: 25% 1fr; 
     overflow: hidden;
     min-height: 600px; 
 }
@@ -636,9 +637,9 @@ img {
     opacity: 0.8;
 }
 
-/* --- NEW DATA LAYOUT --- */
+/* --- DATA LAYOUT --- */
 .dashboard-data {
-    padding: 40px 50px;
+    padding: 50px 60px; /* More padding for breathability */
     position: relative;
     display: flex;
     flex-direction: column;
@@ -648,69 +649,71 @@ img {
 .data-header {
     border-bottom: 1px solid #eee;
     padding-bottom: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
 }
-.data-header h3 { font-family: var(--font-display-serif); font-size: 2.5rem; color: #000; margin: 0; }
-#last-update { font-family: var(--font-mono); font-size: 0.75rem; color: #999; text-transform: uppercase; }
+.data-header h3 { font-family: var(--font-display-serif); font-size: 3rem; color: #000; margin: 0; }
+#last-update { font-family: var(--font-mono); font-size: 0.8rem; color: #999; text-transform: uppercase; }
 
-/* The wrapper that splits text and metrics */
+/* Wrapper splits text and metrics */
 .data-content-wrapper {
     display: grid;
-    grid-template-columns: 0.8fr 1.2fr; /* Text takes 40%, Data takes 60% */
-    gap: 60px;
+    /* CHANGED: Split available space 40% Text / 60% Charts */
+    grid-template-columns: 0.8fr 1.2fr; 
+    gap: 80px; /* HUGE gap to separate columns cleanly */
     height: 100%;
 }
 
 .data-left-col {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
 }
 
 .data-right-col {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
 }
 
 #system-blurb { 
     font-family: var(--font-body); 
     color: #444; 
-    margin-bottom: 25px; 
-    font-size: 1rem; 
-    line-height: 1.6; 
+    margin-bottom: 30px; 
+    font-size: 1.1rem; /* Slightly larger text */
+    line-height: 1.7; 
 }
 
 .finding-box {
-    border-left: 3px solid var(--accent-color);
-    padding-left: 20px;
-    margin-bottom: 30px;
-    font-size: 0.95rem;
+    border-left: 4px solid var(--accent-color);
+    padding-left: 25px;
+    margin-bottom: 40px;
+    font-size: 1rem;
     font-style: italic;
     color: #555;
     background: #fafafa;
-    padding: 15px;
+    padding: 20px 25px;
     border-radius: 0 8px 8px 0;
 }
 
-/* Bubbles: Now 4 across in a single row */
+/* Bubbles: 4 across */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 Columns! */
-    gap: 15px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
     margin-bottom: 0;
 }
 
 .metric-card {
     background: #F9F9FB;
     border-radius: var(--radius-md);
-    padding: 15px;
+    padding: 20px 15px;
     cursor: pointer;
     border: 1px solid transparent;
     transition: 0.2s;
-    text-align: center; /* Centered for compact look */
+    text-align: center;
 }
 .metric-card:hover { border-color: #ccc; transform: translateY(-3px); }
 .metric-card.active {
@@ -719,27 +722,27 @@ img {
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-.m-label { display: block; font-family: var(--font-heading); font-size: 0.65rem; text-transform: uppercase; color: #888; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 5px; }
-.m-val { display: block; font-size: 1.4rem; font-weight: 700; color: #000; font-family: var(--font-heading); }
-.m-val small { font-size: 0.7rem; color: #aaa; font-weight: 400; font-family: var(--font-mono); display: block; margin-top: -2px;}
+.m-label { display: block; font-family: var(--font-heading); font-size: 0.7rem; text-transform: uppercase; color: #888; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 5px; }
+.m-val { display: block; font-size: 1.6rem; font-weight: 700; color: #000; font-family: var(--font-heading); }
+.m-val small { font-size: 0.75rem; color: #aaa; font-weight: 400; font-family: var(--font-mono); display: block; margin-top: -2px;}
 
 /* Chart Area */
 .chart-container {
     flex-grow: 1;
     background: #F9F9FB;
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
-    min-height: 250px; /* Taller chart */
+    min-height: 300px;
 }
 
 .chart-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    font-size: 0.75rem;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
     color: #888;
     text-transform: uppercase;
     font-weight: 600;
@@ -749,15 +752,15 @@ img {
 .pill-toggle {
     background: #e0e0e0;
     border-radius: var(--radius-pill);
-    padding: 2px;
+    padding: 3px;
     display: flex;
 }
 .toggle-opt {
     border: none;
     background: transparent;
-    padding: 5px 14px;
+    padding: 6px 16px;
     border-radius: var(--radius-pill);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
     color: #666;
@@ -774,7 +777,7 @@ img {
     color: var(--ua-blue);
     font-weight: 700;
     font-family: var(--font-heading);
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-transform: uppercase;
     padding-bottom: 2px;
     border-bottom: 2px solid rgba(0,0,0,0.1);
@@ -793,16 +796,20 @@ img {
 .spinner { width: 50px; height: 50px; border: 4px solid #eee; border-top-color: var(--ua-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to {transform: rotate(360deg);} }
 
-/* Responsive Adjustments for Dashboard */
-@media (max-width: 1200px) {
-    .dashboard-card { grid-template-columns: 250px 1fr; }
-    .data-content-wrapper { gap: 30px; }
+/* Responsive Adjustments */
+@media (max-width: 1400px) {
+    .integrated-container { max-width: 95vw; }
+    .data-content-wrapper { gap: 40px; }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
     .dashboard-card { grid-template-columns: 1fr; }
-    .dashboard-visual { height: 250px; }
+    .dashboard-visual { height: 200px; }
     .data-content-wrapper { grid-template-columns: 1fr; gap: 30px; }
+    .metrics-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
     .metrics-grid { grid-template-columns: repeat(2, 1fr); }
 }
 

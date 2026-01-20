@@ -407,44 +407,65 @@ img {
 .service-col:hover p { height: auto; opacity: 1; margin-bottom: 10px; }
 .service-col:hover .read-more-btn { opacity: 1; transform: translateY(0); }
 
-/* Ticker */
+/* ==========================================================================
+   PARTNERS TICKER (Infinite Scroll with Logos)
+   ========================================================================== */
 .partners-ticker {
     background: var(--ua-white);
-    padding: 30px 0;
+    padding: 40px 0;
     overflow: hidden;
     white-space: nowrap;
     border-bottom: 1px solid #eee;
     position: relative;
     z-index: 5;
+    /* Optional: Add a subtle shadow to separate from content above */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .ticker-track {
-    display: inline-block;
-    animation: scroll 30s linear infinite;
+    display: flex;
+    gap: 80px; /* Space between logos */
+    width: max-content;
+    animation: scroll 60s linear infinite; /* 60s makes it readable */
 }
 
-.ticker-track:hover { animation-play-state: paused; }
+/* Pause animation on hover so users can click */
+.ticker-track:hover {
+    animation-play-state: paused;
+}
 
-.partner-logo {
-    display: inline-block;
-    color: #ccc;
-    font-family: var(--font-heading);
-    font-weight: 800;
-    font-size: 1.5rem;
-    margin: 0 40px;
+.partner-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0.6;
-    transition: 0.3s;
+    filter: grayscale(100%); /* Start black & white for clean look */
+    transition: all 0.3s var(--ease-smooth);
 }
 
-.partner-logo:hover {
-    color: var(--ua-blue);
+.partner-item img {
+    height: 50px; /* Fixed height for consistency */
+    width: auto;
+    object-fit: contain;
+    max-width: 180px; /* Prevents wide logos from dominating */
+}
+
+.partner-item:hover {
     opacity: 1;
+    filter: grayscale(0%); /* Reveal color on hover */
     transform: scale(1.05);
 }
 
 @keyframes scroll {
     0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    100% { transform: translateX(-50%); } /* Scrolls half the width (since we duplicated contents) */
+}
+
+/* Mobile Adjustment */
+@media (max-width: 768px) {
+    .partners-ticker { padding: 30px 0; }
+    .ticker-track { gap: 40px; }
+    .partner-item img { height: 35px; }
 }
 
 /* ==========================================================================

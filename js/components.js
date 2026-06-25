@@ -5,27 +5,40 @@ class B2Interface {
         // 1 = pages/category/ (not used here)
         // 2 = pages/about/file.html
         this.root = depthLevel === 0 ? "./" : "../".repeat(depthLevel);
+        this.doc = document.documentElement;
+        this.scrollTicking = false;
         
         this.init();
     }
 
     init() {
+        this.doc.classList.add('b2-interface-booting');
         this.injectHeader();
         this.injectFooter();
         this.handleMobileMenu();
+        this.handleScrollBehavior();
+        this.releaseBootState();
+    }
+
+    releaseBootState() {
+        const release = () => {
+            this.doc.classList.remove('b2-interface-booting');
+            this.doc.classList.add('b2-interface-ready');
+        };
+
+        if (typeof queueMicrotask === 'function') {
+            queueMicrotask(release);
+        } else {
+            Promise.resolve().then(release);
+        }
     }
 
     injectHeader() {
         const headerContainer = document.getElementById('global-header');
         if (!headerContainer) return;
+        if (headerContainer.dataset.b2Hydrated === 'true') return;
 
         headerContainer.innerHTML = `
-            <!-- Loading Overlay -->
-            <div class="loader" id="page-loader">
-                <div class="loader-text">SYSTEM INITIALIZING...</div>
-                <div class="loader-bar"></div>
-            </div>
-
             <!-- Protocol Header -->
             <div class="protocol-header">
                 <div class="container protocol-flex">
@@ -170,20 +183,13 @@ class B2Interface {
                 </div>
             </nav>
         `;
-
-        // Animation: Loader fade out
-        setTimeout(() => {
-            const loader = document.getElementById('page-loader');
-            if(loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
-            }
-        }, 800);
+        headerContainer.dataset.b2Hydrated = 'true';
     }
 
     injectFooter() {
         const footerContainer = document.getElementById('global-footer');
         if (!footerContainer) return;
+        if (footerContainer.dataset.b2Hydrated === 'true') return;
 
         footerContainer.innerHTML = `
             <footer class="main-footer">
@@ -233,6 +239,7 @@ class B2Interface {
                 </div>
             </footer>
         `;
+        footerContainer.dataset.b2Hydrated = 'true';
     }
 
     handleMobileMenu() {
@@ -240,10 +247,65 @@ class B2Interface {
         const menu = document.getElementById('nav-menu-links');
         
         if(btn && menu) {
+            if (btn.dataset.b2Bound === 'true') return;
+            btn.dataset.b2Bound = 'true';
+            btn.setAttribute('aria-expanded', 'false');
+
             btn.addEventListener('click', () => {
                 menu.classList.toggle('active');
                 btn.classList.toggle('active');
+                btn.setAttribute('aria-expanded', menu.classList.contains('active') ? 'true' : 'false');
+
+                // Prevent body scroll when menu is open
+                if (menu.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && menu.classList.contains('active')) {
+                    menu.classList.remove('active');
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                }
             });
         }
+    }
+
+    handleScrollBehavior() {
+        const protocolHeader = document.querySelector('.protocol-header');
+        const mainNav = document.querySelector('.main-nav');
+        
+        if (!protocolHeader && !mainNav) return;
+
+        const SCROLL_THRESHOLD = 60;
+
+        const onScroll = () => {
+            if (this.scrollTicking) return;
+            this.scrollTicking = true;
+
+            requestAnimationFrame(() => {
+                const scrolled = window.scrollY > SCROLL_THRESHOLD;
+
+                if (protocolHeader) {
+                    protocolHeader.classList.toggle('scrolled', scrolled);
+                }
+                if (mainNav) {
+                    mainNav.classList.toggle('scrolled', scrolled);
+                }
+
+                this.scrollTicking = false;
+            });
+        };
+
+        // Use passive listener for performance
+        window.addEventListener('scroll', onScroll, { passive: true });
+        
+        // Check initial state
+        onScroll();
     }
 }

@@ -1,0 +1,123 @@
+/* ==========================================================================
+   BIOSPHERE 2 - CONFERENCE
+   Venue styling aligned with the About section visual system.
+   ========================================================================== */
+
+.conference-page {
+    background:
+        linear-gradient(180deg, #edf4f7 0%, #fbfaf6 42%, #eef5f8 100%);
+}
+
+.conference-page .internal-hero-media img {
+    object-position: center;
+}
+
+.conference-page .internal-summary {
+    max-width: 70ch;
+}
+
+.conference-page .content-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+}
+
+.conference-page .article-flow {
+    max-width: 76ch;
+}
+
+.conference-page .article-flow .article-lead {
+    font-family: var(--font-serif);
+    font-size: clamp(1.15rem, 1.55vw, 1.42rem);
+    line-height: 1.5;
+    color: var(--ua-midnight);
+}
+
+.conference-page .article-flow h2 {
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(0, 28, 72, 0.08);
+}
+
+.conference-page .article-flow h2:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.conference-page .top-featured-image {
+    min-height: clamp(300px, 34vw, 500px);
+}
+
+.conference-page .top-featured-image img {
+    min-height: clamp(300px, 34vw, 500px);
+}
+
+.conference-page .cta-band.with-media {
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 320px);
+}
+
+.conference-page .cta-band.with-media .cta-actions {
+    grid-column: 1 / -1;
+}
+
+.conference-page .form-modern {
+    border-top: 3px solid var(--ua-red);
+}
+
+.conference-page .form-modern p {
+    font-size: 1rem;
+}
+
+.conference-page .card-grid.compact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.conference-page .content-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+}
+
+.conference-page .content-card .text-link {
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+.conference-page .image-feature-grid.expanded {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.conference-page .image-feature-grid.expanded .image-feature:nth-child(n+9) {
+    display: none;
+}
+
+.conference-page .image-feature {
+    border-radius: var(--radius-sm);
+}
+
+.conference-page .image-feature img {
+    height: 240px;
+    object-fit: cover;
+}
+
+.conference-page .quick-card {
+    border-top: 3px solid var(--ua-red);
+}
+
+@media (max-width: 1120px) {
+    .conference-page .image-feature-grid.expanded {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .conference-page .content-layout,
+    .conference-page .cta-band.with-media,
+    .conference-page .card-grid.compact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .conference-page .image-feature-grid.expanded {
+        grid-template-columns: 1fr;
+    }
+}

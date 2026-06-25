@@ -20,9 +20,9 @@
             --bg-deep: #050505;
             --bg-panel: rgba(20, 20, 20, 0.6);
             --border-glass: rgba(255, 255, 255, 0.08);
-            --accent-primary: #3b82f6; /* Electric Blue */
-            --accent-glow: rgba(59, 130, 246, 0.4);
-            --accent-secondary: #8b5cf6; /* Violet */
+            --accent-primary: #378DBD;
+            --accent-glow: rgba(55, 141, 189, 0.38);
+            --accent-secondary: #AB0520;
             --success: #10b981;
             --danger: #ef4444;
             --text-main: #ffffff;
@@ -36,8 +36,8 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-deep);
-            background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
-                              radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+            background-image: radial-gradient(circle at 15% 50%, rgba(55, 141, 189, 0.12), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(171, 5, 32, 0.1), transparent 25%);
             color: var(--text-main);
             margin: 0;
             height: 100vh;
@@ -95,7 +95,10 @@
             border-radius: 12px;
             font-family: 'Inter', sans-serif;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
         }
         input:focus, select:focus {
             outline: none;
@@ -167,6 +170,7 @@
             padding: 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 16px 44px rgba(0, 0, 0, 0.22);
         }
 
         .kpi-label { font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
@@ -192,7 +196,8 @@
             padding: 20px;
             position: relative;
             flex-grow: 1;
-            min-height: 0;
+            min-height: 340px;
+            box-shadow: 0 18px 52px rgba(0, 0, 0, 0.28);
         }
         
         /* Advanced Stats Row */
@@ -200,8 +205,12 @@
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 16px;
-            height: 220px;
+            height: clamp(230px, 24vh, 300px);
+            min-height: 230px;
         }
+
+        .chart-wrapper canvas { min-height: 320px; }
+        .analysis-container canvas { min-height: 190px; }
 
         .stat-row {
             display: flex;

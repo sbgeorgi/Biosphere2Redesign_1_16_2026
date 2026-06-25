@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Biosphere 2 Virtualization | Biosphere 2</title>
+<meta name="description" content="Explore Biosphere 2 research systems through an interactive 3D model, curated system briefs, field media, and live sensor context.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans:   ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          serif:  ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+          mono:   ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          paper:    '#FBFAF6',
+          cream:    '#F5F2EA',
+          ink:      '#1A1F2E',
+          ink2:     '#2A2F3A',
+          mute:     '#5A6271',
+          faint:    '#97A0AE',
+          hair:     'rgba(0, 46, 93, 0.10)',
+          line:     'rgba(0, 46, 93, 0.20)',
+          midnight: '#002E5D',
+          azurite:  '#1B5E9F',
+          oasis:    '#2E8BC0',
+          sky:      '#81D3EB',
+          red:      '#AB0520',
+          bloom:    '#C8102E',
+          leaf:     '#2F6F4F',
+          mesa:     '#A95C42',
+          sand:     '#C9A24A',
+        },
+        letterSpacing: { tightest: '0em' }
+      }
+    }
+  }
+</script>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- Chart.js for real sensor trend visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+<script src="biosphere2_data.js"></script>
+<link rel="stylesheet" href="style.css">
+
+<style>
+  /* =====================================================================
+     ANIMATION PAGE — runtime-critical + brand-aligned primitives
+     (Component-level rules live in animation.css under .virtualization-app)
+     ===================================================================== */
+
+  :root {
+    /* UofA brand — also defined in style.css; mirrored here so the page is
+       resilient if style.css is delayed by the network. */
+    --ua-midnight:  #002E5D;
+    --ua-azurite:   #1B5E9F;
+    --ua-oasis:     #2E8BC0;
+    --ua-sky:       #81D3EB;
+    --ua-blue:      #1A1F2E;
+    --ua-red:       #AB0520;
+    --ua-bloom:     #C8102E;
+    --ua-leaf:      #2F6F4F;
+    --ua-mesa:      #A95C42;
+    --ua-sand:      #C9A24A;
+    --ua-white:     #FFFFFF;
+    --ua-paper:     #FBFAF6;
+    --ua-cream:     #F5F2EA;
+    --ua-warm-gray: #F5F2EA;
+
+    /* Display + body + mono families (mirror about.css design system) */
+    --font-display: "Fraunces", "Tiempos Headline", Georgia, serif;
+    --font-body:    "Inter", "Söhne", "Helvetica Neue", Arial, sans-serif;
+    --font-heading: "Inter", "Söhne", "Helvetica Neue", Arial, sans-serif;
+    --font-mono:    "JetBrains Mono", "Söhne Mono", "SF Mono", ui-monospace, monospace;
+
+    /* Motion */
+    --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-soft:     cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--ua-paper);
+    color: var(--ua-blue);
+    font-family: var(--font-body);
+    font-feature-settings: "ss01", "cv11", "kern";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Thin custom scrollbars — visible enough to be discoverable, quiet enough not to shout */
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: rgba(0,46,93,0.22) transparent; }
+  .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: rgba(0,46,93,0.18);
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb:hover { background: rgba(0,46,93,0.32); background-clip: padding-box; }
+
+  /* =====================================================================
+     LOADING SCREEN — brand wordmark + progress hairline
+     ===================================================================== */
+  #loading-screen {
+    position: absolute; inset: 0; z-index: 100;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background:
+      radial-gradient(circle at 50% 36%, rgba(129,211,235,0.18), transparent 32rem),
+      linear-gradient(180deg, #fbfaf6 0%, #edf3f6 100%);
+    transition: opacity 700ms var(--ease-out-expo);
+  }
+  #loading-screen .wordmark {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 3.4vw, 2.8rem);
+    color: var(--ua-midnight);
+    letter-spacing: -0.01em;
+    line-height: 1;
+    opacity: 0; animation: fadeUp 800ms 100ms var(--ease-out-expo) forwards;
+  }
+  #loading-screen .sub {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--ua-red);
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    margin: 0.55rem 0 2.4rem;
+    opacity: 0; animation: fadeUp 800ms 220ms var(--ease-out-expo) forwards;
+  }
+  #loading-bar {
+    width: 220px; height: 2px;
+    background: rgba(0, 46, 93, 0.12);
+    overflow: hidden;
+    border-radius: 999px;
+  }
+  #loading-bar::after {
+    content: ''; display: block; height: 100%; width: 32%;
+    background: linear-gradient(90deg, var(--ua-red), var(--ua-oasis));
+    border-radius: 999px;
+    animation: load 1400ms var(--ease-out-expo) forwards;
+  }
+  @keyframes load { from { transform: translateX(-100%); } to { transform: translateX(320%); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* =====================================================================
+     TOASTS
+     ===================================================================== */
+  #toast-stack {
+    position: fixed; bottom: 48px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 300; display: flex; flex-direction: column-reverse;
+    gap: 8px; pointer-events: none;
+  }
+  .toast {
+    background: rgba(0, 46, 93, 0.94);
+    color: var(--ua-paper);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 12px; letter-spacing: 0.01em;
+    display: flex; align-items: center; gap: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 32px rgba(0, 28, 72, 0.20);
+    animation: toastIn 320ms var(--ease-out-expo);
+  }
+  .toast i { color: var(--ua-sand); }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .toast.fade { animation: toastOut 280ms forwards; }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(10px); } }
+
+  /* =====================================================================
+     KEYCAP
+     ===================================================================== */
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 6px;
+    border: 1px solid rgba(0, 46, 93, 0.16);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--ua-midnight);
+    background: #fff;
+    line-height: 1;
+    display: inline-block;
+  }
+
+  /* =====================================================================
+     FOCUS VISIBLE — accessibility
+     ===================================================================== */
+  .virtualization-app button:focus-visible,
+  .virtualization-app a:focus-visible,
+  .virtualization-app input:focus-visible,
+  .virtualization-app .biome-row:focus-visible,
+  .virtualization-app .sensor-card:focus-visible {
+    outline: 2px solid var(--ua-red);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  /* =====================================================================
+     CAROUSEL — runtime behavior (layout lives in animation.css)
+     ===================================================================== */
+  .carousel-track { display: flex; height: 100%; transition: transform 700ms var(--ease-out-expo); will-change: transform; }
+  .carousel-slide { min-width: 100%; height: 100%; position: relative; }
+  .carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .carousel-slide::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(0,28,72,0.55));
+    pointer-events: none;
+  }
+  .carousel-dot {
+    width: 18px; height: 2px;
+    background: rgba(255,255,255,0.42);
+    border: none; padding: 0; cursor: pointer;
+    transition: background 200ms, width 280ms var(--ease-out-expo);
+  }
+  .carousel-dot.active { background: #fff; width: 30px; }
+  .carousel-nav {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(0, 28, 72, 0.55);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 180ms;
+    border: none; cursor: pointer;
+  }
+  .carousel-nav:hover { background: rgba(0, 28, 72, 0.80); }
+
+  /* =====================================================================
+     SENSOR / LIVE TAB — runtime component styles
+     ===================================================================== */
+  .sensor-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 46, 93, 0.14);
+    background: rgba(255, 255, 255, 0.6);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ua-blue);
+    cursor: pointer;
+    transition: all 200ms var(--ease-out-expo);
+  }
+  .sensor-pill:hover { background: #fff; border-color: rgba(0, 46, 93, 0.22); transform: translateY(-1px); }
+  .sensor-pill.active {
+    background: var(--ua-red);
+    border-color: var(--ua-red);
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(171, 5, 32, 0.18);
+  }
+  .sensor-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(0,46,93,0.3); }
+  .sensor-pill.active .dot { background: #fff; }
+
+  .range-toggle {
+    display: inline-flex; padding: 2px;
+    background: rgba(0, 46, 93, 0.06);
+    border-radius: 999px;
+  }
+  .range-toggle button {
+    border: none; background: transparent;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 10.5px; font-family: var(--font-mono);
+    color: var(--ua-mute, #5A6271); cursor: pointer;
+    transition: background 200ms, color 200ms;
+    font-weight: 600;
+  }
+  .range-toggle button.active {
+    background: #fff; color: var(--ua-midnight);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 46, 93, 0.10);
+    border-radius: 12px;
+    padding: 12px 10px 6px;
+  }
+  .chart-title {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 0 4px;
+  }
+  .chart-title .metric {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ua-midnight);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .chart-title .value {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--ua-blue);
+    font-weight: 500;
+  }
+
+  /* =====================================================================
+     SKELETON SHIMMER (loading placeholders)
+     ===================================================================== */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(0,46,93,0.04) 0%, rgba(0,46,93,0.10) 50%, rgba(0,46,93,0.04) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    border-radius: 4px;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+  /* =====================================================================
+     LIVE PULSE DOT
+     ===================================================================== */
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ua-red);
+    animation: livePulse 1.6s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(171,5,32,0.4);
+  }
+  @keyframes livePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(171,5,32,0.40); }
+    50%      { box-shadow: 0 0 0 5px rgba(171,5,32,0); }
+  }
+  .live-dot.stale { background: rgba(0,46,93,0.25); animation: none; box-shadow: none; }
+
+  /* =====================================================================
+     REDUCED MOTION
+     ===================================================================== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+    #loading-bar::after { animation: none !important; transform: translateX(220%); }
+  }
+</style>
+<link rel="stylesheet" href="animation.css">
+</head>
+<body class="animation-page">
+
+<div id="global-header"></div>
+
+<main id="virtualization-main" class="virtualization-main">
+<section id="virtualization-app" class="virtualization-app" aria-label="Biosphere 2 Virtualization">
+
+  <!-- Backdrop gradient behind canvas -->
+  <div id="backdrop"></div>
+
+  <!-- Loading screen -->
+  <div id="loading-screen">
+    <div class="wordmark">Biosphere 2</div>
+    <div class="sub">Virtualization</div>
+    <div id="loading-bar"></div>
+  </div>
+
+  <!-- Three.js canvas mount point -->
+  <div id="canvas-container"></div>
+
+  <!-- 3D hover label -->
+  <div id="hover-label" role="status" aria-live="polite"></div>
+
+  <!-- ===========================================================
+       SIDEBAR — biome list + view controls
+       (brand context now lives here, not in a redundant topbar)
+       =========================================================== -->
+  <aside id="sidebar" class="glass" aria-label="Research systems">
+    <div class="sidebar-head">
+      <div class="sidebar-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
+          </svg>
+        </div>
+        <div class="sidebar-brand-text">
+          <div class="sidebar-brand-title">Biosphere 2</div>
+          <div class="sidebar-brand-sub">Virtualization</div>
+        </div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-meta">
+        <div>
+          <div class="sidebar-eyebrow">Research Systems</div>
+          <div class="sidebar-sub">7 mapped biomes · Oracle, AZ</div>
+        </div>
+        <div class="sidebar-count" id="biome-index-label" aria-live="polite">07</div>
+      </div>
+    </div>
+
+    <div id="biome-list" class="biome-list scroll-thin" role="listbox" aria-label="Select a research system"></div>
+
+    <div class="sidebar-foot">
+      <div class="sidebar-foot-head">
+        <div class="sidebar-eyebrow">View Controls</div>
+      </div>
+      <div class="view-toggles">
+        <label class="view-toggle" data-tip="Auto-orbit (O)">
+          <input type="checkbox" class="toggle" id="t-orbit">
+          <i data-lucide="orbit" class="w-4 h-4"></i>
+          <span>Orbit</span>
+        </label>
+        <label class="view-toggle" data-tip="Structural grid (W)">
+          <input type="checkbox" class="toggle" id="t-wire" checked>
+          <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+          <span>Grid</span>
+        </label>
+        <label class="view-toggle" data-tip="Cutaway structure (C)">
+          <input type="checkbox" class="toggle" id="t-cutaway">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>Cutaway</span>
+        </label>
+        <label class="view-toggle" data-tip="System labels">
+          <input type="checkbox" class="toggle" id="t-labels" checked>
+          <i data-lucide="tag" class="w-4 h-4"></i>
+          <span>Labels</span>
+        </label>
+      </div>
+      <div class="view-actions">
+        <button id="btn-reset" class="view-action" aria-label="Reset camera (R)">
+          <i data-lucide="scan" class="w-4 h-4"></i>
+          <span>Reset</span>
+        </button>
+        <button id="btn-top" class="view-action" aria-label="Top-down view (T)">
+          <i data-lucide="arrow-up" class="w-4 h-4"></i>
+          <span>Top view</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===========================================================
+       INFO PANEL — closed by default; opens only after an explicit selection
+       States: closed / selected
+       =========================================================== -->
+  <aside id="info-panel" class="glass is-closed" aria-label="System detail" role="complementary" aria-hidden="true">
+    <!-- Panel header -->
+    <header class="panel-head">
+      <div class="panel-head-text min-w-0">
+        <div class="panel-eyebrow" id="panel-eyebrow">System brief</div>
+        <h2 id="panel-title" class="panel-title">Select a system</h2>
+        <div id="panel-subtitle" class="panel-subtitle">Click a mapped area or a menu item to open details</div>
+      </div>
+      <button id="panel-close" class="panel-close" aria-label="Close system detail" title="Close detail panel">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </header>
+
+    <!-- Panel essentials (sticky — never scroll) -->
+    <div class="panel-essentials">
+      <!-- Carousel -->
+      <div class="carousel" id="carousel">
+        <div class="carousel-track" id="carousel-track"></div>
+        <div class="carousel-badge" id="carousel-badge">
+          <span id="carousel-badge-text">Site media</span>
+        </div>
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10" id="carousel-dots"></div>
+        <div class="absolute bottom-3 right-3 flex gap-1 z-10" id="carousel-nav-wrap">
+          <button id="carousel-prev" class="carousel-nav" aria-label="Previous image">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+          </button>
+          <button id="carousel-next" class="carousel-nav" aria-label="Next image">
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sensor cards (roomy 2x2 layout below media, clickable to plot trends) -->
+      <div id="stats-grid" class="stats-grid" role="list" aria-label="Live sensor readings"></div>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="tab-row" id="tab-row" aria-label="System detail tabs">
+      <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+      <button class="tab-btn" data-tab="live" role="tab" aria-selected="false">Live Sensors</button>
+      <button class="tab-btn" data-tab="timeline" role="tab" aria-selected="false">Timeline</button>
+      <div class="tab-underline" id="tab-underline"></div>
+    </nav>
+
+    <!-- Scrollable tab content -->
+    <div id="tab-content" class="panel-detail scroll-thin" role="tabpanel"></div>
+
+    <!-- Sticky footer CTA -->
+    <footer class="panel-foot">
+      <a id="panel-link" href="#" class="panel-cta">
+        <span id="panel-link-text">Open research hub</span>
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      </a>
+    </footer>
+  </aside>
+
+  <!-- ===========================================================
+       PINNED HOVER LABEL — persists the last-hovered biome name
+       =========================================================== -->
+  <div id="pinned-label" class="pinned-label" aria-live="polite">
+    <div class="pinned-label-rule"></div>
+    <div class="pinned-label-text">
+      <div class="pinned-label-eyebrow">Inspecting</div>
+      <div class="pinned-label-name" id="pinned-label-name">—</div>
+    </div>
+    <div class="pinned-label-hint">Click to select</div>
+  </div>
+
+  <!-- ===========================================================
+       STATUS BAR — runtime telemetry
+       =========================================================== -->
+  <div id="statusbar" role="status" aria-live="polite">
+    <div class="status-cluster">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span class="status-label">LIVE</span>
+      <span class="status-divider" aria-hidden="true"></span>
+      <span id="status-fps">60 FPS</span>
+    </div>
+    <div class="status-cluster status-right">
+      <span id="status-zoom">Z 1.00×</span>
+      <span class="status-divider" aria-hidden="true"></span>
+      <span class="hidden sm:inline">Oracle, AZ</span>
+    </div>
+  </div>
+
+
+  <!-- Toast stack -->
+  <div id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+</section>
+</main>
+
+<div id="global-footer"></div>
+<script src="header.js"></script>
+<script>
+  new B2Interface(0);
+</script>
+
+<!-- ============================================================
+     Three.js importmap
+     ============================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { unzlibSync } from "https://unpkg.com/fflate@0.8.2/esm/browser.js";
+
+// ============================================================
+// DATA DECODING (biosphere2_data.js stays unchanged)
+// ============================================================
+const B2 = window.B2_DATA || {};
+
+function b64ToU8(b64){
+  if(!b64) return new Uint8Array(0);
+  const bin = atob(b64); const len = bin.length;
+  const out = new Uint8Array(len);
+  for(let i=0;i<len;i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function decZlibB64ToU8(b64){ return unzlibSync(b64ToU8(b64)); }
+function u8ToAB(u8){
+  if(u8.byteOffset===0 && u8.byteLength===u8.buffer.byteLength) return u8.buffer;
+  return u8.buffer.slice(u8.byteOffset, u8.byteOffset+u8.byteLength);
+}
+function decF32(b64){ const u8 = decZlibB64ToU8(b64); return new Float32Array(u8ToAB(u8)); }
+function decIdx(b64, bits){
+  const u8 = decZlibB64ToU8(b64); const ab = u8ToAB(u8);
+  if(bits===16) return new Uint16Array(ab);
+  return new Uint32Array(ab);
+}
+
+const dLines = decF32(B2.dLinesB64);
+const dMesh = { verts: decF32(B2.dMeshVertsB64), indices: decIdx(B2.dMeshIdxB64, B2.dMeshIdxBits) };
+const buildingSections = {};
+for(const [k,v] of Object.entries(B2.buildingSectionsB64 || {})) buildingSections[k] = v ? decF32(v) : new Float32Array(0);
+const biomeCutMeshes = {};
+for(const [k,v] of Object.entries(B2.biomeCutMeshesB64 || {})) biomeCutMeshes[k] = v ? decF32(v) : new Float32Array(0);
+
+const config = B2.config;
+const sectionGroups = B2.sectionGroups;
+const biomeRegions = B2.biomeRegions;
+
+// ============================================================
+// PER-BIOME ACCENT PALETTE
+// ============================================================
+const BIOME_ACCENT = {
+  rainforest:    '#2F6F4F',
+  savannah:      '#C9A24A',
+  desert:        '#A95C42',
+  ocean:         '#007D84',
+  mangroves:     '#70B865',
+  human_habitat: '#5F6B7E',
+  leo:           '#1B5E9F',
+};
+
+// ============================================================
+// REAL SENSOR DEFINITIONS (data.b2.arizona.edu)
+// ============================================================
+const SENSORS = {
+  ocean: [
+    { id: "463",  label: "Water Temp",   unit: "°C" },
+    { id: "469",  label: "Dissolved O₂", unit: "mg/L" },
+    { id: "457",  label: "pH Level",     unit: "pH" },
+    { id: "467",  label: "Salinity",     unit: "PSU" }
+  ],
+  rainforest: [
+    { id: "562",  label: "Mtn Temp",   unit: "°F" },
+    { id: "561",  label: "Humidity",   unit: "%" },
+    { id: "567",  label: "CO₂",        unit: "ppm" },
+    { id: "546",  label: "Pond Temp",  unit: "°F" }
+  ],
+  savannah: [
+    { id: "535",  label: "Lower Temp", unit: "°F" },
+    { id: "538",  label: "Humidity",   unit: "%" },
+    { id: "543",  label: "Base CO₂",   unit: "ppm" },
+    { id: "832",  label: "Scrub Temp", unit: "°F" }
+  ],
+  desert: [
+    { id: "1157", label: "Air Temp",    unit: "°F" },
+    { id: "1158", label: "Humidity",    unit: "%" },
+    { id: "1164", label: "Air Flow",    unit: "" },
+    { id: "1155", label: "Supply Temp", unit: "°F" }
+  ],
+  mangroves: [
+    { id: "463",  label: "Water Temp",   unit: "°C" },
+    { id: "469",  label: "Dissolved O₂", unit: "mg/L" },
+    { id: "561",  label: "Humidity",     unit: "%" },
+    { id: "467",  label: "Salinity",     unit: "PSU" }
+  ],
+  human_habitat: [],
+  leo: [
+    { id: "19362", label: "West Temp",  unit: "°F" },
+    { id: "19361", label: "Airflow",    unit: "cfm" },
+    { id: "616",   label: "Base CO₂",   unit: "ppm" },
+    { id: "578",   label: "Humidity",   unit: "%" }
+  ]
+};
+
+// ============================================================
+// SENSOR FETCHER — Biosphere 2 live TimeSeries endpoint via corsproxy
+// ============================================================
+const PROXY_URL = 'https://corsproxy.io/?';
+const TARGET_URL = 'https://data.b2.arizona.edu/Bio2Controls/TimeSeries.jsp?tab=';
+
+async function fetchSensorData(id) {
+  try {
+    const encodedUrl = encodeURIComponent(TARGET_URL + id);
+    const response = await fetch(PROXY_URL + encodedUrl);
+    if (!response.ok) return null;
+    const text = await response.text();
+    const match = text.match(/window\.chart1_chartModel\s*=\s*({[\s\S]*?});/);
+    if (!match) return null;
+    const raw = JSON.parse(match[1]);
+    if (!raw.layers || !raw.layers[0]) return null;
+    const layer = raw.layers[0];
+    const data = layer.dataSets[0].data;
+    const times = layer.xValues;
+    const offset = 62135596800; // .NET epoch → Unix epoch (seconds)
+    const history = [];
+    let current = null, currentTime = null;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] !== null && Math.abs(data[i]) > 0.01) {
+        current = data[i];
+        currentTime = (times[i] - offset) * 1000;
+        history.push({ x: currentTime, y: data[i] });
+      }
+    }
+    return { current, currentTime, history };
+  } catch (e) {
+    console.warn(`Sensor ${id} fetch failed:`, e);
+    return null;
+  }
+}
+
+// ============================================================
+// BIOME METADATA (curated)
+// ============================================================
+const BIOMES = {
+  rainforest: {
+    name: "Tropical Rainforest",
+    subtitle: "Equatorial canopy mesocosm",
+    video: "gvmwcoGwLnM",
+    link: "https://biosphere2.org/research/projects/tropical-rainforest",
+    images: [
+      "https://dartmouthalumnimagazine.com/sites/default/files/inline_images/biosphere_2_2.jpg",
+      "https://bloximages.chicago2.vip.townnews.com/tucson.com/content/tncms/assets/v3/editorial/d/71/d712167c-91f1-5415-9236-71dc25f99a7a/5faf605bf0c7e.image.jpg?resize=750%2C500"
+    ],
+    desc: "A controlled, multi-layered ecosystem simulating the Amazonian basin. Features a man-made mountain, cloud forest zone, and floodplain. The canopy captures atmospheric water, recycling it through condensation and creating a self-sustaining humidity loop that researchers use to model tropical carbon flux.",
+    timeline: [
+      { y: "1991", t: "Sealed mission begins — rainforest established as primary carbon sink." },
+      { y: "1994", t: "Cloud forest zone added to capture condensation dynamics." },
+      { y: "2010", t: "Drought experiment reveals surprising canopy resilience." },
+      { y: "2023", t: "New LiDAR scan maps 4,200 individual plants." }
+    ]
+  },
+  savannah: {
+    name: "Savanna Grassland",
+    subtitle: "Hydrological transition zone",
+    video: null,
+    images: [
+      "https://biosphere2.org/sites/default/files/styles/az_small/public/2021-08/Savanna.jpg.webp?itok=fdgk6uXK",
+      "https://scontent.frtb1-1.fna.fbcdn.net/v/t39.30808-6/470200543_18471878458003767_489748950467195742_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFvxFY3IVO_Ug0vPuLuGE2pyD3CRUAcjvDIPcJFQByO8CoNKZl-DO4bg5hfe0L7afM&_nc_ohc=ogfCEqT5LKoQ7kNvwFPe-6z&_nc_oc=AdniXt2IV9ihRWXV3lQXxw2Pio-zTmtmFDJ8ub_TMbiK0ypjwgKiYvR_6ldlI_GgXgc&_nc_zt=23&_nc_ht=scontent.frtb1-1.fna&_nc_gid=-nyCGk15xtygGmbi_P3_UA&oh=00_AfiSQxaUo_EpW9gzqVkmnr6wOUxOmlHn-giVqRgcLCgJ8g&oe=69210669"
+    ],
+    desc: "The hydrological transition zone. Acting as a critical atmospheric buffer, the Savanna mediates the extreme gradient between the humid Rainforest and arid Desert. Seasonal inundation cycles are reproduced artificially, allowing scientists to study how grasslands respond to shifting precipitation regimes.",
+    timeline: [
+      { y: "1991", t: "Designed as hydrological buffer between rainforest and desert." },
+      { y: "2005", t: "First controlled burn experiment." },
+      { y: "2018", t: "Grass species inventory updated to 47 taxa." }
+    ]
+  },
+  desert: {
+    name: "Coastal Fog Desert",
+    subtitle: "Arid Baja California analogue",
+    video: "CtGqdVqqnQo",
+    link: "https://biosphere2.org/research/projects/coastal-fog-desert",
+    images: [
+      "https://vvchurch.org/wp-content/uploads/2024/07/biosphere-2-desert.jpg",
+      "https://media.sciencephoto.com/c0/21/15/25/c0211525-800px-wm.jpg"
+    ],
+    desc: "Modeled after the coastal deserts of Baja California. Specialized 'mini-rhizotron' sensors embedded in the dunes allow non-invasive observation of root systems. The desert's sharp diurnal temperature swing — over 25°C between dawn and midday — generates unique atmospheric exchanges that are tracked continuously by the sensor mesh.",
+    timeline: [
+      { y: "1991", t: "Fog desert established with Baja California endemics." },
+      { y: "2009", t: "Mini-rhizotron root imaging array installed." },
+      { y: "2020", t: "Multi-year drought simulation begins." }
+    ]
+  },
+  ocean: {
+    name: "Marine Mesocosm",
+    subtitle: "Enclosed Caribbean reef system",
+    video: "BB-dGCnVK2A",
+    link: "https://biosphere2.org/research/projects/marine-mesocosm",
+    images: [
+      "https://hakaimagazine.com/wp-content/uploads/ocean-biosphere-2.jpg",
+      "https://radiocafe.media/wp-content/uploads/2021/03/biosphere.jpg"
+    ],
+    desc: "A fully enclosed Caribbean reef system. Famous for early acidification experiments, it now serves as a testbed for coral restoration. The 3.8-million-liter tank sustains over 50 fish species and a living coral community that has survived two decades under controlled chemistry — a unique baseline for studying climate stress on reef ecosystems.",
+    timeline: [
+      { y: "1991", t: "Reef seeded with 30 Caribbean coral species." },
+      { y: "2012", t: "Landmark ocean acidification paper published." },
+      { y: "2019", t: "Coral fragmentation restoration program launched." }
+    ]
+  },
+  mangroves: {
+    name: "Mangrove Wetland",
+    subtitle: "Estuarine salinity gradient",
+    video: "E3ufP1MmdeI",
+    link: "https://biosphere2.org/research/projects/mangrove-wetland",
+    images: [
+      "https://biosphere2.org/sites/default/files/styles/az_large/public/2021-08/Photo%205.jpeg.webp?itok=CEEsG17o",
+      "https://images.squarespace-cdn.com/content/v1/628938f9b510382413081a83/247b3d0c-c50b-431e-b9de-b8cee819ab4e/maxwell-ridgeway-LROuwFNy9h4-unsplash.jpg"
+    ],
+    desc: "Modeled on the Florida Everglades. A gradient of salinity connects freshwater marsh to tidal saltwater mangroves. The six-section design lets researchers study how mangrove root architecture filters nutrients and sequesters carbon — a critical function for climate resilience in coastal zones worldwide.",
+    timeline: [
+      { y: "1992", t: "Mangrove transplants from Florida take root." },
+      { y: "2008", t: "Storm-surge simulation series completed." },
+      { y: "2022", t: "Blue carbon sequestration study published." }
+    ]
+  },
+  human_habitat: {
+    name: "Human Habitat",
+    subtitle: "Historic mission habitat & operations area",
+    video: "bMTT4aRmdkE",
+    link: "about/history/index.html",
+    images: [
+      "https://media.12news.com/assets/KPNX/images/c7990032-7831-46be-8376-79e21adeaa5f/c7990032-7831-46be-8376-79e21adeaa5f_1920x1080.jpg",
+      "https://www.doney.net/aroundaz/DA_bionaut_quarters.jpg"
+    ],
+    desc: "The crew quarters during the sealed missions. Features apartments, labs, a kitchen, and a library tower. During the 1991–1993 mission, eight 'bionauts' lived here continuously, farming their own food and managing every aspect of the closed-loop ecosystem.",
+    timeline: [
+      { y: "1991", t: "Mission 1 begins — 8 crew sealed for 2 years." },
+      { y: "1994", t: "Mission 2 ends early due to management disputes." },
+      { y: "2007", t: "Reopened as interpretive and operations space for visitors and staff." }
+    ]
+  },
+  leo: {
+    name: "LEO Project",
+    subtitle: "Landscape Evolution Observatory",
+    video: "oHs0ZBOAMZU",
+    link: "https://biosphere2.org/research/projects/leo",
+    images: [
+      "https://cdn.uanews.arizona.edu/s3fs-public/LEO-Feature.jpg?VersionId=I7aeY1OxaFqH6xGrSAmmC9OBQyx2KWMr",
+      "https://m3eng.com/wp-content/uploads/Landscape-Evolution-Observatory-700x464_c.jpg"
+    ],
+    desc: "Landscape Evolution Observatory. Three massive, instrumented hillslopes filled with crushed basalt. LEO tracks how lifeless rock evolves into living soil — measuring water, carbon, and microbial colonization at a resolution impossible in nature. It is the largest experiment ever built to study Earth's critical zone.",
+    timeline: [
+      { y: "2010", t: "Construction begins on three 333m² hillslopes." },
+      { y: "2013", t: "First rainfall simulation, baseline abiotic state." },
+      { y: "2018", t: "Microbial colonization reaches all slopes." },
+      { y: "2024", t: "Drought-stress experiment enters Phase III." }
+    ]
+  }
+};
+
+const BIOME_DETAILS = {
+  rainforest: {
+    label: "Ecosystem Research System",
+    subtitle: "Tropical canopy, climate, and carbon cycling",
+    link: "research/rainforest/index.html",
+    desc: "Biosphere 2's rainforest is a controlled tropical system built to study how plants, soils, water, and the atmosphere exchange carbon under drought, warming, and shifting humidity. The model lets researchers test climate pressures with a level of instrumentation that is impossible in the field.",
+    facts: ["Amazon Basin analogue", "Canopy-to-soil monitoring", "Climate stress experiments"],
+    focus: ["Drought response and canopy resilience", "Water recycling through condensation and evapotranspiration", "Plant-soil-atmosphere carbon exchange"]
+  },
+  savannah: {
+    label: "Ecosystem Research System",
+    subtitle: "Grassland transition between wet and arid systems",
+    link: "research/savanna/index.html",
+    desc: "The savanna functions as a hydrological transition zone between the rainforest and desert. It helps researchers examine how grasslands respond when precipitation timing, soil moisture, and atmospheric conditions shift across wet-dry gradients.",
+    facts: ["Seasonal moisture gradient", "Grassland climate analogue", "Rainforest-desert buffer"],
+    focus: ["Precipitation timing and plant productivity", "Soil moisture feedbacks across transition zones", "Grassland resilience under climate variability"]
+  },
+  desert: {
+    label: "Ecosystem Research System",
+    subtitle: "Coastal fog desert and arid-zone adaptation",
+    link: "research/desert/index.html",
+    desc: "The coastal fog desert models arid ecosystems shaped by cool-season moisture, heat, and extreme daily swings. Its controlled environment supports studies of root behavior, desert plant water use, and the biology of climate-stressed drylands.",
+    facts: ["Baja California analogue", "Root-zone observation", "Heat and humidity control"],
+    focus: ["Water-use strategies in desert plants", "Root dynamics under drought conditions", "Arid ecosystem response to atmospheric change"]
+  },
+  ocean: {
+    label: "Marine Research System",
+    subtitle: "Enclosed ocean, reef, and chemistry lab",
+    link: "research/ocean/index.html",
+    desc: "The ocean system is one of the world's largest enclosed marine mesocosms, built to test reef response to changing chemistry, temperature, and biological stress. It gives researchers a rare platform for controlled coral and seawater experiments at ecosystem scale.",
+    facts: ["Large enclosed reef system", "Controlled seawater chemistry", "Coral restoration platform"],
+    focus: ["Ocean acidification and reef resilience", "Coral restoration under controlled stress", "Marine ecosystem response at mesocosm scale"]
+  },
+  mangroves: {
+    label: "Ecosystem Research System",
+    subtitle: "Wetland salinity, roots, and coastal resilience",
+    link: "research/mangroves/index.html",
+    desc: "The mangrove wetland reproduces an estuarine gradient where freshwater, salinity, roots, microbes, and sediment interact. It supports studies of blue carbon, nutrient filtering, and the climate value of coastal wetlands.",
+    facts: ["Six-section wetland gradient", "Salinity and nutrient tracking", "Blue carbon research"],
+    focus: ["Mangrove root architecture and nutrient filtering", "Wetland carbon storage and coastal resilience", "Salinity gradients under changing water conditions"]
+  },
+  human_habitat: {
+    label: "Historic / Operations Area",
+    subtitle: "Sealed-mission habitat, labs, and support spaces",
+    link: "about/history/index.html",
+    linkLabel: "Open history page",
+    isActiveResearch: false,
+    desc: "The human habitat is not presented as an active research biome. It is the historic crew habitat and operations area that made the original sealed missions possible — apartments, labs, kitchen, library tower, and life-support spaces that document how people lived inside the engineered ecosystem.",
+    facts: ["Historic sealed-mission quarters", "Labs and life-support spaces", "Interpretive operations area"],
+    focusTitle: "Historic Context",
+    focus: ["Daily life and closed-system operations", "Human factors in life-support architecture", "Mission-era lessons for Earth and space analog design"],
+    liveEmptyTitle: "No active live sensor stream",
+    liveEmptySub: "Historic/operations area · not an active research biome"
+  },
+  leo: {
+    label: "Earth Systems Observatory",
+    subtitle: "Landscape Evolution Observatory",
+    link: "research/leo/index.html",
+    desc: "LEO is a trio of massive, instrumented hillslopes that turns crushed basalt into a living critical-zone experiment. Researchers can follow water, carbon, minerals, and microbial colonization as rock begins the long transformation into soil.",
+    facts: ["Three instrumented hillslopes", "Crushed basalt critical zone", "Water-carbon-microbe tracking"],
+    focus: ["How lifeless rock becomes living soil", "Water movement through evolving landscapes", "Microbial colonization and carbon cycling"]
+  }
+};
+
+for (const [id, details] of Object.entries(BIOME_DETAILS)) {
+  if (BIOMES[id]) Object.assign(BIOMES[id], details);
+}
+for (const id of Object.keys(BIOMES)) {
+  if (typeof BIOMES[id].isActiveResearch !== 'boolean') BIOMES[id].isActiveResearch = true;
+  if (!BIOMES[id].linkLabel) BIOMES[id].linkLabel = BIOMES[id].isActiveResearch ? 'Open research page' : 'Open history page';
+}
+
+const BIOME_ID_TO_SELECTION = {
+  rainforest: "Rainforest", savannah: "Savannah", desert: "Desert",
+  ocean: "Ocean", mangroves: "Mangroves",
+  human_habitat: "Human Habitat", leo: "LEO"
+};
+const SELECTION_TO_BIOME_ID = {};
+for (const [id, label] of Object.entries(BIOME_ID_TO_SELECTION)) SELECTION_TO_BIOME_ID[label] = id;
+
+const BIOME_ORDER = ["rainforest","savannah","desert","ocean","mangroves","human_habitat","leo"];
+const BIOME_ICONS = {
+  rainforest:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-2 3-5 5-5 8a5 5 0 0 0 10 0c0-3-3-5-5-8z"/><path d="M12 13v9"/></svg>',
+  savannah:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M6 20V8l4-3 4 3v12M14 20v-7l4-2v9"/></svg>',
+  desert:        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19c3-1 6 1 9 0s6-1 9 0"/><path d="M9 14c-1 0-2-1-2-2s1-3 3-3 3 2 3 3-1 2-2 2"/><path d="M16 11l1-2 1 2M14 9l1-2 1 2"/></svg>',
+  ocean:         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 17c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 7c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>',
+  mangroves:     '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8M9 11c-1-1-3-1-4 0M15 11c1-1 3-1 4 0M9 14c-2 0-4 1-5 3M15 14c2 0 4 1 5 3M12 11v10"/></svg>',
+  human_habitat: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/></svg>',
+  leo:           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5-9 5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+};
+
+// ============================================================
+// STATE
+// ============================================================
+const STATE = {
+  autoRotate: false,
+  wireframe: true,
+  cutawayStructure: false,
+  showLabels: true,
+  currentBiome: null,
+  activeSelection: null,
+  carouselIndex: 0,
+  carouselTimer: null,
+  activeTab: "overview",
+  cameraTween: null,
+  fps: 60,
+  fpsAcc: 0,
+  fpsFrames: 0,
+  fpsLast: performance.now(),
+  // Live sensor state
+  sensorData: [],
+  sensorRequestId: 0,
+  selectedSensorIndex: 0,
+  timeRange: '24h',
+  chart: null,
+  sensorRefreshTimer: null,
+  paused: false,
+  // Hover state stays lightweight; detail panel opens only on explicit click/selection.
+  hoveredBiome: null,
+  pinnedBiomeName: null,
+  panelMode: 'closed' // 'closed' | 'selected'
+};
+
+// ============================================================
+// SCENE — three.js singletons
+// ============================================================
+let scene, camera, renderer, controls, raycaster, pointer;
+let topoGroup, buildGroup, worldGroup;
+let meshTerrain = null;
+let selectionRing3D = null;
+const biomeMeshes = {};
+const meshesBySection = {};
+const pickable = [];
+const hoverable = [];
+const biomeCentroids = {};
+
+function init() {
+  scene = new THREE.Scene();
+  scene.background = null;
+  scene.fog = new THREE.Fog(0xF7F3EE, 12000, 40000);
+
+  const viewport = getViewportSize();
+  camera = new THREE.PerspectiveCamera(45, viewport.width / viewport.height, 1, 500000);
+  camera.position.set(0, 4200, 8400);
+
+  // Renderer: high-performance, sRGB-correct output, capped DPR (mobile saves GPU)
+  renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+    powerPreference: 'high-performance',
+    stencil: false,
+  });
+  renderer.setSize(viewport.width, viewport.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.5 : 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+  document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.autoRotate = STATE.autoRotate;
+  controls.autoRotateSpeed = 0.45;
+  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.minDistance = 200;
+  controls.maxDistance = 40000;
+
+  // Lighting — hemisphere + 3 directional (key/fill/rim)
+  const hemi = new THREE.HemisphereLight(0xFFFFFF, 0xE6E4DD, 0.85);
+  scene.add(hemi);
+  const key = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+  key.position.set(2400, 3200, 2400);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xC8D8E4, 0.35);
+  fill.position.set(-2200, 800, -2400);
+  scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xFFF3E0, 0.25);
+  rim.position.set(0, -1500, 1500);
+  scene.add(rim);
+
+  worldGroup = new THREE.Group();
+  worldGroup.rotation.x = -Math.PI / 2;
+  scene.add(worldGroup);
+
+  topoGroup = new THREE.Group();
+  buildGroup = new THREE.Group();
+  worldGroup.add(topoGroup);
+  worldGroup.add(buildGroup);
+
+  buildGeometry();
+  computeBiomeCentroids();
+  buildSelectionHalo();
+
+  raycaster = new THREE.Raycaster();
+  pointer = new THREE.Vector2();
+  window.addEventListener('resize', onResize);
+
+  // Visibility-aware render loop — pause when tab hidden to save GPU/battery
+  document.addEventListener('visibilitychange', () => {
+    STATE.paused = document.hidden;
+    if (!STATE.paused) {
+      // reset FPS counter so it doesn't read a fake huge delta on resume
+      STATE.fpsLast = performance.now();
+      STATE.fpsFrames = 0;
+    }
+  });
+
+  // Click vs drag detection — only fire onCanvasClick for genuine taps
+  let downX = 0, downY = 0, downT = 0;
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    downX = e.clientX; downY = e.clientY; downT = performance.now();
+  });
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
+    if (moved < 5 && performance.now() - downT < 400) onCanvasClick(e);
+  });
+  renderer.domElement.addEventListener('pointermove', onPointerMove);
+  renderer.domElement.addEventListener('pointerleave', () => {
+    document.getElementById('hover-label').classList.remove('show');
+    STATE.hoveredBiome = null;
+    updateBiomeHoverState(null);
+  });
+
+  if (window.lucide) lucide.createIcons();
+  buildBiomeList();
+  bindUI();
+  bindEscapeToClose();
+
+  // Keep the detail panel closed by default. Hover only shows labels; click opens details.
+  closeInfoPanel();
+
+  // Fade out loading screen
+  setTimeout(() => {
+    const loading = document.getElementById('loading-screen');
+    if (loading) {
+      loading.style.opacity = 0;
+      setTimeout(() => loading.remove(), 700);
+    }
+    toast('Biosphere 2 Virtualization ready', 'globe');
+  }, 1200);
+
+  update3DHighlight();
+  animate();
+}
+
+function getViewportSize() {
+  const container = document.getElementById('canvas-container');
+  const width = Math.max(320, container ? container.clientWidth : window.innerWidth);
+  const height = Math.max(320, container ? container.clientHeight : window.innerHeight);
+  return { width, height };
+}
+
+function buildGeometry() {
+  const zExag = config.z_exaggeration || 1.0;
+
+  function makeGeo(verts, indices, applyZExag = true) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+    if (indices && indices.length) g.setIndex(new THREE.BufferAttribute(indices, 1));
+    if (applyZExag) {
+      const pos = g.attributes.position;
+      for (let i = 0; i < pos.count; i++) pos.setZ(i, pos.getZ(i) * zExag);
+    }
+    g.computeVertexNormals();
+    return g;
+  }
+
+  if (dMesh && dMesh.verts && dMesh.verts.length) {
+    meshTerrain = new THREE.Mesh(
+      makeGeo(dMesh.verts, dMesh.indices, true),
+      new THREE.MeshPhongMaterial({
+        color: 0xE8E6DF, side: THREE.DoubleSide, flatShading: true,
+        transparent: true, opacity: 0.75,
+        shininess: 4, specular: 0x333333,
+        polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
+      })
+    );
+    meshTerrain.name = "TerrainFull";
+    topoGroup.add(meshTerrain);
+    pickable.push(meshTerrain);
+    hoverable.push(meshTerrain);
+  }
+
+  if (dLines && dLines.length) {
+    const lines = new THREE.LineSegments(
+      makeGeo(dLines, null, true),
+      new THREE.LineBasicMaterial({ color: 0xA8A59B, transparent: true, opacity: 0.35 })
+    );
+    topoGroup.add(lines);
+  }
+
+  for (const [name, verts] of Object.entries(biomeCutMeshes || {})) {
+    if (!verts || !verts.length) continue;
+    const biomeId = SELECTION_TO_BIOME_ID[name] || name.toLowerCase();
+    const accentHex = BIOME_ACCENT[biomeId] || '#1B5E9F';
+    const accentInt = parseInt(accentHex.replace('#',''), 16);
+    const mesh = new THREE.Mesh(
+      makeGeo(verts, null, true),
+      new THREE.MeshPhongMaterial({
+        color: accentInt, side: THREE.DoubleSide, flatShading: true,
+        transparent: true, opacity: 0.95, emissive: accentInt, emissiveIntensity: 0.12,
+        shininess: 8
+      })
+    );
+    mesh.visible = false;
+    mesh.name = `BiomeCut_${name}`;
+    mesh.userData.biomeId = biomeId;
+    mesh.userData.biomeName = BIOMES[biomeId] ? BIOMES[biomeId].name : name;
+    topoGroup.add(mesh);
+    biomeMeshes[name] = mesh;
+    pickable.push(mesh);
+    hoverable.push(mesh);
+  }
+
+  for (const [sectionName, verts] of Object.entries(buildingSections || {})) {
+    if (!verts || !verts.length) continue;
+    const info = sectionGroups[sectionName] || null;
+    const rawColor = info ? info.color : 0xa3a3a3;
+    const sectionColor = softenColor(rawColor);
+
+    const g = makeGeo(verts, null, false);
+
+    const solidMesh = new THREE.Mesh(g, new THREE.MeshPhongMaterial({
+      color: sectionColor, transparent: true, opacity: 0.42, side: THREE.DoubleSide,
+      flatShading: true, shininess: 6, specular: 0x444444
+    }));
+    solidMesh.userData.section = sectionName;
+    solidMesh.userData.baseColor = sectionColor;
+
+    const wireMesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({
+      color: sectionColor, wireframe: true, transparent: true, opacity: 0.35
+    }));
+    wireMesh.visible = true;
+
+    buildGroup.add(solidMesh);
+    buildGroup.add(wireMesh);
+    pickable.push(solidMesh);
+    hoverable.push(solidMesh);
+
+    if (!meshesBySection[sectionName]) meshesBySection[sectionName] = [];
+    meshesBySection[sectionName].push({ solid: solidMesh, wire: wireMesh });
+  }
+
+  topoGroup.scale.set(config.scale, config.scale, config.scale);
+  topoGroup.position.set(config.x, config.y, config.z);
+  topoGroup.updateMatrixWorld(true);
+  buildGroup.updateMatrixWorld(true);
+}
+
+function softenColor(hex) {
+  const r = (hex >> 16) & 0xff, g = (hex >> 8) & 0xff, b = hex & 0xff;
+  const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+  const mix = (c) => Math.round(c * 0.35 + lum * 0.65);
+  return (mix(r) << 16) | (mix(g) << 8) | mix(b);
+}
+
+function computeBiomeCentroids() {
+  for (const [name, mesh] of Object.entries(biomeMeshes)) {
+    mesh.geometry.computeBoundingBox();
+    const bb = mesh.geometry.boundingBox;
+    const localCenter = new THREE.Vector3();
+    bb.getCenter(localCenter);
+    const worldCenter = mesh.localToWorld(localCenter.clone());
+    const biomeId = SELECTION_TO_BIOME_ID[name] || name.toLowerCase();
+    biomeCentroids[biomeId] = worldCenter;
+  }
+  for (const [name, data] of Object.entries(biomeRegions || {})) {
+    const biomeId = SELECTION_TO_BIOME_ID[name] || name.toLowerCase();
+    if (biomeCentroids[biomeId]) continue;
+    const b = data.bounds;
+    const localCenter = new THREE.Vector3((b.x_min+b.x_max)/2, (b.y_min+b.y_max)/2, 0);
+    const worldCenter = topoGroup.localToWorld(localCenter.clone());
+    biomeCentroids[biomeId] = worldCenter;
+  }
+}
+
+function buildSelectionHalo() {
+  const geo = new THREE.RingGeometry(120, 140, 96);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xAB0520, transparent: true, opacity: 0.5, side: THREE.DoubleSide
+  });
+  selectionRing3D = new THREE.Mesh(geo, mat);
+  selectionRing3D.rotation.x = -Math.PI / 2;
+  selectionRing3D.visible = false;
+  scene.add(selectionRing3D);
+}
+
+// ============================================================
+// INTERACTION
+// ============================================================
+function getRegionFromPoint(worldPoint) {
+  const local = topoGroup.worldToLocal(worldPoint.clone());
+  const x = local.x, y = local.y;
+  for (const [name, data] of Object.entries(biomeRegions)) {
+    const b = data.bounds;
+    if (x >= b.x_min && x <= b.x_max && y >= b.y_min && y <= b.y_max) return name;
+  }
+  return null;
+}
+
+function onCanvasClick(event) {
+  if (event.target.closest('#sidebar, #info-panel, #statusbar, .toast, .pinned-label')) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+
+  const intersects = raycaster.intersectObjects(pickable, true);
+  if (!intersects.length) { clearSelection(); return; }
+
+  const hit = intersects[0];
+  const obj = hit.object;
+
+  let selectionName = null;
+  if (obj.userData && obj.userData.section) {
+    if (obj.userData.section === "Biomes") selectionName = getRegionFromPoint(hit.point);
+    else selectionName = obj.userData.section;
+  } else if (obj === meshTerrain || (obj.name && obj.name.startsWith("BiomeCut_"))) {
+    selectionName = getRegionFromPoint(hit.point);
+    if (!selectionName && obj.userData && obj.userData.biomeId) {
+      navigateTo(obj.userData.biomeId);
+      return;
+    }
+  }
+
+  if (selectionName) {
+    const biomeId = SELECTION_TO_BIOME_ID[selectionName];
+    if (biomeId && BIOMES[biomeId]) navigateTo(biomeId);
+    else clearSelection();
+  } else {
+    clearSelection();
+  }
+}
+
+// Resolve a pointer event to a biomeId (or null) by raycasting against pickable meshes.
+// Used by hover labels and click selection.
+function resolveBiomeFromPointer(event) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(hoverable, true);
+  if (!intersects.length) return null;
+  const hit = intersects[0];
+  const obj = hit.object;
+  if (obj.userData && obj.userData.biomeId) return obj.userData.biomeId;
+  if (obj.userData && obj.userData.section) {
+    if (obj.userData.section === "Biomes") {
+      const regionName = getRegionFromPoint(hit.point);
+      return regionName ? (SELECTION_TO_BIOME_ID[regionName] || null) : null;
+    }
+    return SELECTION_TO_BIOME_ID[obj.userData.section] || null;
+  }
+  if (obj === meshTerrain || (obj.name && obj.name.startsWith("BiomeCut_"))) {
+    const regionName = getRegionFromPoint(hit.point);
+    if (regionName) return SELECTION_TO_BIOME_ID[regionName] || null;
+  }
+  return null;
+}
+
+function onPointerMove(event) {
+  // Hover is intentionally lightweight: show labels and bottom hint only.
+  // The detail panel never opens until the user clicks a selectable area.
+  if (event.target.closest('#sidebar, #info-panel, #statusbar, .toast, .pinned-label')) {
+    document.getElementById('hover-label').classList.remove('show');
+    return;
+  }
+
+  const biomeId = resolveBiomeFromPointer(event);
+  const label = document.getElementById('hover-label');
+
+  if (biomeId) {
+    const b = BIOMES[biomeId];
+    if (b) {
+      label.innerHTML = `<strong>${b.name}</strong><em>${b.subtitle || ''}</em>`;
+      label.style.left = event.clientX + 'px';
+      label.style.top = event.clientY + 'px';
+      label.classList.add('show');
+
+      if (STATE.hoveredBiome !== biomeId) {
+        STATE.hoveredBiome = biomeId;
+        STATE.pinnedBiomeName = b.name;
+        updatePinnedLabel(b.name);
+        updateBiomeHoverState(biomeId);
+      }
+    }
+  } else {
+    label.classList.remove('show');
+    if (STATE.hoveredBiome !== null) {
+      STATE.hoveredBiome = null;
+      updateBiomeHoverState(null);
+    }
+  }
+}
+
+function updateBiomeHoverState(id) {
+  document.querySelectorAll('.biome-row').forEach(row => {
+    row.classList.toggle('is-hovered', !!id && row.dataset.id === id);
+  });
+}
+function openInfoPanel() {
+  const panel = document.getElementById('info-panel');
+  if (!panel) return;
+  panel.classList.remove('is-closed');
+  panel.classList.add('is-open');
+  panel.setAttribute('aria-hidden', 'false');
+}
+
+function closeInfoPanel() {
+  const panel = document.getElementById('info-panel');
+  if (!panel) return;
+  panel.classList.remove('is-open');
+  panel.classList.add('is-closed');
+  panel.setAttribute('aria-hidden', 'true');
+}
+
+function clearSelection(options = {}) {
+  const { closePanel = true } = options;
+  STATE.currentBiome = null;
+  STATE.activeSelection = null;
+  STATE.hoveredBiome = null;
+  STATE.pinnedBiomeName = null;
+  STATE.panelMode = 'closed';
+  update3DHighlight();
+  updateBiomeHoverState(null);
+  document.querySelectorAll('.biome-row').forEach(r => {
+    r.classList.remove('active');
+    r.setAttribute('aria-selected', 'false');
+  });
+  if (selectionRing3D) selectionRing3D.visible = false;
+  document.getElementById('biome-index-label').textContent = '07';
+  updatePinnedLabel(null);
+  stopCarousel();
+  stopSensorRefresh();
+  destroyChart();
+  if (closePanel) closeInfoPanel();
+}
+function update3DHighlight() {
+  const sel = STATE.activeSelection;
+  const cutStructure = STATE.cutawayStructure;
+  const showWire = STATE.wireframe;
+
+  for (const [sectionName, list] of Object.entries(meshesBySection)) {
+    const isBiomeStructure = (sectionName === "Biomes");
+    const isNatureSelection = !!(sel && biomeRegions[sel]);
+
+    let isSelectedGroup = false;
+    if (sel) {
+      if (sectionName === sel) isSelectedGroup = true;
+      if (isBiomeStructure && isNatureSelection) isSelectedGroup = true;
+    }
+
+    list.forEach(({ solid, wire }) => {
+      wire.visible = showWire;
+      if (!sel) {
+        solid.visible = true;
+        solid.material.opacity = 0.42;
+        solid.material.color.setHex(solid.userData.baseColor);
+        wire.material.opacity = 0.35;
+        return;
+      }
+      if (isSelectedGroup) {
+        if (cutStructure && isBiomeStructure) {
+          solid.visible = false; wire.visible = false;
+        } else {
+          solid.visible = true;
+          if (isBiomeStructure) {
+            solid.material.opacity = 0.10;
+            solid.material.color.setHex(0xffffff);
+            wire.material.opacity = 0.55;
+          } else {
+            solid.material.opacity = 0.92;
+            solid.material.color.setHex(solid.userData.baseColor);
+            wire.material.opacity = 0.85;
+          }
+        }
+      } else {
+        solid.visible = true;
+        solid.material.opacity = 0.05;
+        wire.material.opacity = 0.04;
+      }
+    });
+  }
+
+  const isNatureSelection = !!(sel && biomeRegions[sel]);
+  if (meshTerrain) meshTerrain.visible = !isNatureSelection;
+  for (const [name, mesh] of Object.entries(biomeMeshes)) mesh.visible = (sel === name);
+
+  if (selectionRing3D) {
+    if (isNatureSelection) {
+      const biomeId = SELECTION_TO_BIOME_ID[sel];
+      const center = biomeCentroids[biomeId];
+      if (center) {
+        const accent = BIOME_ACCENT[biomeId] || '#AB0520';
+        selectionRing3D.material.color.set(accent);
+        selectionRing3D.position.copy(center);
+        selectionRing3D.visible = STATE.showLabels;
+      } else selectionRing3D.visible = false;
+    } else {
+      selectionRing3D.visible = false;
+    }
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+// ============================================================
+// PANEL RENDERING — closed by default; populated only after selection
+// ============================================================
+
+// Hover previews were intentionally removed: hover labels stay on-canvas; details open only on click.
+
+// Update the persistent pinned hover label (bottom of 3D viewport)
+function updatePinnedLabel(name) {
+  const el = document.getElementById('pinned-label');
+  const nameEl = document.getElementById('pinned-label-name');
+  if (!el || !nameEl) return;
+  if (name) {
+    nameEl.innerText = name;
+    el.classList.add('show');
+  } else {
+    el.classList.remove('show');
+  }
+}
+
+// Selected state: biome is clicked — full content, fly-to, sensor fetch
+window.navigateTo = function(id) {
+  const data = BIOMES[id];
+  if (!data) return;
+
+  const isSwitch = STATE.currentBiome !== id;
+  STATE.currentBiome = id;
+  STATE.activeSelection = BIOME_ID_TO_SELECTION[id] || null;
+  STATE.activeTab = "overview";
+  STATE.selectedSensorIndex = 0;
+  STATE.panelMode = 'selected';
+  openInfoPanel();
+
+  destroyChart();
+  update3DHighlight();
+
+  document.querySelectorAll('.biome-row').forEach(r => {
+    const active = r.dataset.id === id;
+    r.classList.toggle('active', active);
+    r.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  const idx = BIOME_ORDER.indexOf(id) + 1;
+  document.getElementById('biome-index-label').textContent = String(idx).padStart(2,'0');
+
+  flyToBiome(id);
+
+  document.getElementById('panel-title').innerText = data.name;
+  document.getElementById('panel-subtitle').innerText = data.subtitle || '';
+  document.getElementById('panel-eyebrow').innerText = data.label || 'Research System';
+  const link = document.getElementById('panel-link');
+  if (data.link) {
+    link.href = data.link;
+    link.style.opacity = '1'; link.style.pointerEvents = 'auto';
+  } else {
+    link.href = '#';
+    link.style.opacity = '0.4'; link.style.pointerEvents = 'none';
+  }
+  document.getElementById('panel-link-text').innerText = data.linkLabel || 'Open research page';
+
+  // Carousel — full content + autoplay
+  const track = document.getElementById('carousel-track');
+  track.innerHTML = (data.images || []).map(src =>
+    `<div class="carousel-slide"><img src="${src}" loading="lazy" alt=""></div>`
+  ).join('');
+  STATE.carouselIndex = 0;
+  document.getElementById('carousel-nav-wrap').style.display = (data.images && data.images.length > 1) ? '' : 'none';
+  const badge = document.getElementById('carousel-badge');
+  if (badge) {
+    badge.style.display = '';
+    document.getElementById('carousel-badge-text').innerText = 'Site media';
+  }
+  updateCarousel();
+
+  // Stat grid — skeletons until real data arrives
+  const statsGrid = document.getElementById('stats-grid');
+  const sensors = SENSORS[id] || [];
+  if (sensors.length) {
+    statsGrid.innerHTML = sensors.map((s, i) => `
+      <button class="stat-cell" data-sensor-idx="${i}" role="listitem" aria-label="${s.label}">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value"><span class="skeleton" style="display:inline-block;width:48px;height:22px;">&nbsp;</span></div>
+      </button>
+    `).join('');
+    statsGrid.querySelectorAll('.stat-cell').forEach(cell => {
+      cell.addEventListener('click', () => {
+        STATE.selectedSensorIndex = parseInt(cell.dataset.sensorIdx);
+        STATE.activeTab = 'live';
+        document.querySelectorAll('.tab-btn').forEach(t => {
+          t.classList.toggle('active', t.dataset.tab === 'live');
+          t.style.display = ''; // show all tabs once we have a selection
+        });
+        positionTabUnderline();
+        renderTabContent(STATE.currentBiome, 'live');
+      });
+    });
+  } else {
+    statsGrid.innerHTML = `
+      <div class="stat-cell stat-cell-wide" role="listitem">
+        <div class="stat-label">Status</div>
+        <div class="stat-value" style="font-size:0.95rem;">No live sensor stream</div>
+      </div>
+    `;
+  }
+
+  // Tabs — show all three tabs (Overview / Live / Timeline)
+  document.querySelectorAll('.tab-btn').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === 'overview');
+    t.style.display = '';
+    t.setAttribute('aria-selected', t.dataset.tab === 'overview' ? 'true' : 'false');
+  });
+  positionTabUnderline();
+  renderTabContent(id, 'overview');
+
+  startCarousel();
+  loadSensorData(id);
+
+  if (isSwitch) toast(`Selected ${data.name}`, 'navigation');
+};
+
+window.closePanel = function() {
+  clearSelection({ closePanel: true });
+};
+
+// ============================================================
+// CAMERA FLY-TO — with right-panel compensation
+// ============================================================
+function flyToBiome(id) {
+  const center = biomeCentroids[id];
+  if (!center) return;
+
+  const camToTarget = new THREE.Vector3().subVectors(camera.position, controls.target);
+  const currentDist = camToTarget.length();
+  const offsetDir = camToTarget.clone().normalize();
+
+  let radius = 1500;
+  const regionName = BIOME_ID_TO_SELECTION[id];
+  const region = biomeRegions[regionName];
+  if (region) {
+    const b = region.bounds;
+    radius = Math.max(Math.abs(b.x_max - b.x_min), Math.abs(b.y_max - b.y_min)) * 0.65 * (config.scale || 1) + 600;
+  }
+  const targetDist = Math.min(Math.max(currentDist, radius * 1.6), 9000);
+
+  const forward = offsetDir.clone().negate();
+  const worldUp = new THREE.Vector3(0, 1, 0);
+  const camRight = new THREE.Vector3().crossVectors(forward, worldUp).normalize();
+
+  const panelW = 482; // px (panel width + right margin)
+  const vw = window.innerWidth;
+  const panelNDC = (panelW / vw) * 1.0;
+  const fov = camera.fov * Math.PI / 180;
+  const aspect = camera.aspect;
+  const worldPerNDC = targetDist * Math.tan(fov / 2) * aspect;
+  const shiftRight = panelNDC * worldPerNDC * 0.55;
+
+  const baseCamPos = center.clone().add(offsetDir.multiplyScalar(targetDist));
+  baseCamPos.y = Math.max(baseCamPos.y, center.y + targetDist * 0.5);
+  const targetCam = baseCamPos.clone().add(camRight.multiplyScalar(shiftRight));
+
+  tweenCamera(controls.target, center, camera.position, targetCam, 1100);
+}
+
+function tweenCamera(fromTarget, toTarget, fromPos, toPos, duration) {
+  if (STATE.cameraTween) STATE.cameraTween.cancel = true;
+  const tween = { t: 0, cancel: false };
+  STATE.cameraTween = tween;
+  const start = performance.now();
+  function step(now) {
+    if (tween.cancel) return;
+    const k = Math.min(1, (now - start) / duration);
+    const e = easeInOutCubic(k);
+    controls.target.lerpVectors(fromTarget, toTarget, e);
+    camera.position.lerpVectors(fromPos, toPos, e);
+    if (k < 1) requestAnimationFrame(step);
+    else if (STATE.cameraTween === tween) STATE.cameraTween = null;
+  }
+  requestAnimationFrame(step);
+}
+function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+// ============================================================
+// UI BUILDERS
+// ============================================================
+function buildBiomeList() {
+  const list = document.getElementById('biome-list');
+  list.innerHTML = BIOME_ORDER.map((id, idx) => {
+    const b = BIOMES[id];
+    const accent = BIOME_ACCENT[id];
+    const status = b.isActiveResearch ? 'Active research' : 'Historic area';
+    return `
+      <button class="biome-row" data-id="${id}" style="--row-accent:${accent}" role="option" aria-selected="false">
+        <div class="glyph">${BIOME_ICONS[id]}</div>
+        <div class="biome-row-text">
+          <div class="biome-row-topline">
+            <div class="biome-row-name">${b.name}</div>
+            <span class="biome-status ${b.isActiveResearch ? 'is-active-research' : 'is-historic'}">${status}</span>
+          </div>
+          <div class="biome-row-sub">${b.subtitle}</div>
+        </div>
+        <div class="swatch" style="background:${accent}"></div>
+      </button>
+    `;
+  }).join('');
+  list.querySelectorAll('.biome-row').forEach(btn => {
+    btn.addEventListener('click', () => navigateTo(btn.dataset.id));
+    btn.addEventListener('mouseenter', () => {
+      const b = BIOMES[btn.dataset.id];
+      if (b) {
+        STATE.hoveredBiome = btn.dataset.id;
+        updatePinnedLabel(b.name);
+        updateBiomeHoverState(btn.dataset.id);
+      }
+    });
+    btn.addEventListener('mouseleave', () => {
+      STATE.hoveredBiome = null;
+      updateBiomeHoverState(null);
+    });
+  });
+}
+function bindUI() {
+  document.getElementById('t-orbit').addEventListener('change', () => toggleAutoRotate());
+  document.getElementById('t-wire').addEventListener('change', () => toggleWireframe());
+  document.getElementById('t-cutaway').addEventListener('change', () => toggleStructureCutaway());
+  document.getElementById('t-labels').addEventListener('change', () => toggleLabels());
+  document.getElementById('btn-reset').addEventListener('click', () => resetView());
+  document.getElementById('btn-top').addEventListener('click', () => topView());
+  document.getElementById('panel-close').addEventListener('click', () => closePanel());
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      STATE.activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(t => {
+        t.classList.toggle('active', t === btn);
+        t.setAttribute('aria-selected', t === btn ? 'true' : 'false');
+      });
+      positionTabUnderline();
+      if (STATE.currentBiome) renderTabContent(STATE.currentBiome, tab);
+    });
+  });
+  // Keyboard arrow nav for tabs
+  document.getElementById('tab-row').addEventListener('keydown', (e) => {
+    const btns = Array.from(document.querySelectorAll('.tab-btn'));
+    const i = btns.findIndex(b => b.classList.contains('active'));
+    if (i < 0) return;
+    if (e.key === 'ArrowRight') { btns[(i+1) % btns.length].click(); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { btns[(i-1+btns.length) % btns.length].click(); e.preventDefault(); }
+  });
+  setTimeout(positionTabUnderline, 100);
+
+  document.getElementById('carousel-prev').addEventListener('click', () => {
+    if (!STATE.currentBiome) return;
+    const imgs = BIOMES[STATE.currentBiome].images || [];
+    if (!imgs.length) return;
+    STATE.carouselIndex = (STATE.carouselIndex - 1 + imgs.length) % imgs.length;
+    updateCarousel();
+  });
+  document.getElementById('carousel-next').addEventListener('click', () => {
+    if (!STATE.currentBiome) return;
+    const imgs = BIOMES[STATE.currentBiome].images || [];
+    if (!imgs.length) return;
+    STATE.carouselIndex = (STATE.carouselIndex + 1) % imgs.length;
+    updateCarousel();
+  });
+
+}
+
+function positionTabUnderline() {
+  const active = document.querySelector('.tab-btn.active');
+  const underline = document.getElementById('tab-underline');
+  if (!active || !underline) return;
+  const row = active.parentElement;
+  const rowRect = row.getBoundingClientRect();
+  const aRect = active.getBoundingClientRect();
+  underline.style.width = aRect.width + 'px';
+  underline.style.transform = `translateX(${aRect.left - rowRect.left}px)`;
+}
+
+function renderTabContent(id, tab) {
+  const data = BIOMES[id];
+  if (!data) return;
+  const el = document.getElementById('tab-content');
+
+  if (tab === 'overview') {
+    const facts = data.facts || [];
+    const focus = data.focus || [];
+    el.innerHTML = `
+      <p class="overview-lede">${data.desc}</p>
+      ${facts.length ? `
+        <div class="overview-facts">
+          ${facts.map((fact, i) => `
+            <div class="overview-fact">
+              <span>${String(i + 1).padStart(2, '0')}</span>
+              <strong>${fact}</strong>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      ${focus.length ? `
+        <div class="overview-focus">
+          <h4>${data.focusTitle || 'Research Focus'}</h4>
+          <ul>
+            ${focus.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+      ${data.video ? `
+        <div class="overview-video">
+          <div class="overview-video-head">
+            <i data-lucide="video" class="w-3.5 h-3.5"></i>
+            <span>Field footage</span>
+          </div>
+          <div class="video-wrapper" id="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/${data.video}?autoplay=0&rel=0&modestbranding=1" frameborder="0" allowfullscreen style="border-radius:inherit;width:100%;height:100%;" title="${data.name} field footage"></iframe>
+          </div>
+        </div>
+      ` : ''}
+    `;
+  }
+  else if (tab === 'live') {
+    renderLiveTab(id);
+  }
+  else if (tab === 'timeline') {
+    el.innerHTML = `
+      <ol class="timeline">
+        ${(data.timeline || []).map(t => `
+          <li class="timeline-item">
+            <div class="timeline-year">${t.y}</div>
+            <div class="timeline-text">${t.t}</div>
+          </li>`).join('')}
+      </ol>`;
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+// ============================================================
+// LIVE TAB — sensor chart + pill selector
+// ============================================================
+function renderLiveTab(id) {
+  const el = document.getElementById('tab-content');
+  const sensors = SENSORS[id] || [];
+
+  if (!sensors.length) {
+    el.innerHTML = `
+      <div class="live-empty">
+        <i data-lucide="wifi-off" class="w-6 h-6"></i>
+        <div class="live-empty-title">${data.liveEmptyTitle || 'No public live sensor stream'}</div>
+        <div class="live-empty-sub">${data.liveEmptySub || 'Biosphere 2 controls API · data.b2.arizona.edu'}</div>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="live-head">
+      <div class="live-head-left">
+        <span class="live-dot" id="live-tab-dot"></span>
+        <span class="live-head-label">Streaming · Biosphere 2 Controls</span>
+      </div>
+      <span class="live-head-time" id="sensor-last-update">—</span>
+    </div>
+
+    <div class="sensor-pills" id="sensor-pills" role="tablist" aria-label="Select sensor">
+      ${sensors.map((s, i) => `
+        <button class="sensor-pill ${i === STATE.selectedSensorIndex ? 'active' : ''}" data-sensor-idx="${i}" role="tab" aria-selected="${i === STATE.selectedSensorIndex}">
+          <span class="dot"></span>
+          <span>${s.label}</span>
+        </button>
+      `).join('')}
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">
+        <span class="metric" id="chart-metric">${sensors[STATE.selectedSensorIndex].label}</span>
+        <span class="value" id="chart-value">—</span>
+      </div>
+      <canvas id="sensor-chart"></canvas>
+    </div>
+
+    <div class="chart-foot">
+      <div class="range-toggle">
+        <button class="${STATE.timeRange === '24h' ? 'active' : ''}" data-range="24h">24H</button>
+        <button class="${STATE.timeRange === '7d' ? 'active' : ''}" data-range="7d">7D</button>
+      </div>
+      <div class="chart-source">
+        Source: <span>data.b2.arizona.edu</span> · Auto-refresh 60s
+      </div>
+    </div>
+  `;
+
+  // Wire up sensor pill clicks
+  el.querySelectorAll('.sensor-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      STATE.selectedSensorIndex = parseInt(pill.dataset.sensorIdx);
+      el.querySelectorAll('.sensor-pill').forEach(p => {
+        p.classList.toggle('active', p === pill);
+        p.setAttribute('aria-selected', p === pill ? 'true' : 'false');
+      });
+      // Highlight the corresponding stat cell
+      document.querySelectorAll('.stat-cell').forEach((cell, i) => {
+        cell.classList.toggle('is-active', i === STATE.selectedSensorIndex);
+      });
+      updateChart();
+    });
+  });
+
+  // Wire up time range toggle
+  el.querySelectorAll('.range-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      STATE.timeRange = btn.dataset.range;
+      el.querySelectorAll('.range-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+      updateChart();
+    });
+  });
+
+  if (window.lucide) lucide.createIcons();
+
+  // Sync the stat cell highlight
+  document.querySelectorAll('.stat-cell').forEach((cell, i) => {
+    cell.classList.toggle('is-active', i === STATE.selectedSensorIndex);
+  });
+
+  // If sensor data already loaded, populate + (re)create chart now
+  if (STATE.sensorData.length) {
+    populateStatGrid();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => updateChart());
+    });
+  }
+}
+
+// ============================================================
+// SENSOR DATA LOADING (async, with auto-refresh)
+// ============================================================
+async function loadSensorData(id) {
+  stopSensorRefresh();
+  const requestId = ++STATE.sensorRequestId;
+  const sensors = SENSORS[id] || [];
+
+  STATE.sensorData = sensors.map(() => null);
+  if (!sensors.length) return;
+
+  const results = await Promise.all(sensors.map(s => fetchSensorData(s.id)));
+
+  if (requestId !== STATE.sensorRequestId) return;
+  if (STATE.currentBiome !== id) return;
+
+  STATE.sensorData = results;
+  populateStatGrid();
+  if (STATE.activeTab === 'live') updateChart();
+  updateLastRefreshTime();
+
+  STATE.sensorRefreshTimer = setInterval(async () => {
+    if (STATE.currentBiome !== id) { stopSensorRefresh(); return; }
+    const fresh = await Promise.all(sensors.map(s => fetchSensorData(s.id)));
+    if (STATE.currentBiome !== id) return;
+    STATE.sensorData = fresh;
+    populateStatGrid();
+    if (STATE.activeTab === 'live') updateChart();
+    updateLastRefreshTime();
+  }, 60000);
+}
+
+function stopSensorRefresh() {
+  if (STATE.sensorRefreshTimer) {
+    clearInterval(STATE.sensorRefreshTimer);
+    STATE.sensorRefreshTimer = null;
+  }
+  STATE.sensorRequestId++;
+}
+
+function populateStatGrid() {
+  if (!STATE.currentBiome) return;
+  const sensors = SENSORS[STATE.currentBiome] || [];
+  const statsGrid = document.getElementById('stats-grid');
+  if (!statsGrid) return;
+  if (!sensors.length) return;
+
+  statsGrid.innerHTML = sensors.map((s, i) => {
+    const d = STATE.sensorData[i];
+    const val = (d && d.current !== null && d.current !== undefined) ? formatValue(d.current) : '—';
+    return `
+      <button class="stat-cell ${i === STATE.selectedSensorIndex ? 'is-active' : ''}" data-sensor-idx="${i}" role="listitem" aria-label="${s.label}: ${val} ${s.unit||''}">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value">${val}${s.unit ? `<span class="stat-unit">${s.unit}</span>` : ''}</div>
+      </button>
+    `;
+  }).join('');
+
+  // Re-bind stat cell clicks
+  statsGrid.querySelectorAll('.stat-cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      STATE.selectedSensorIndex = parseInt(cell.dataset.sensorIdx);
+      STATE.activeTab = 'live';
+      document.querySelectorAll('.tab-btn').forEach(t => t.classList.toggle('active', t.dataset.tab === 'live'));
+      positionTabUnderline();
+      renderTabContent(STATE.currentBiome, 'live');
+    });
+  });
+}
+
+function formatValue(v) {
+  if (v === null || v === undefined) return '—';
+  if (Math.abs(v) >= 1000) return v.toFixed(0);
+  if (Math.abs(v) >= 100) return v.toFixed(1);
+  return v.toFixed(2);
+}
+
+function updateLastRefreshTime() {
+  const el = document.getElementById('sensor-last-update');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = 'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+// ============================================================
+// CHART (Chart.js)
+// ============================================================
+function destroyChart() {
+  if (STATE.chart) {
+    try { STATE.chart.destroy(); } catch (e) {}
+    STATE.chart = null;
+  }
+}
+
+function updateChart() {
+  if (!STATE.currentBiome) return;
+  const sensors = SENSORS[STATE.currentBiome] || [];
+  if (!sensors.length) return;
+
+  const idx = STATE.selectedSensorIndex;
+  const sensorCfg = sensors[idx];
+  const dataObj = STATE.sensorData[idx];
+  const canvas = document.getElementById('sensor-chart');
+  const metricEl = document.getElementById('chart-metric');
+  const valueEl = document.getElementById('chart-value');
+  if (metricEl) metricEl.textContent = `${sensorCfg.label}${sensorCfg.unit ? ' · ' + sensorCfg.unit : ''}`;
+  if (valueEl) valueEl.textContent = (dataObj && dataObj.current !== null && dataObj.current !== undefined) ? formatValue(dataObj.current) + ' ' + (sensorCfg.unit||'') : '—';
+
+  if (!canvas || !dataObj || !dataObj.history || !dataObj.history.length) return;
+
+  if (STATE.chart && STATE.chart.canvas !== canvas) destroyChart();
+  if (STATE.chart && (STATE.chart.destroyed || !STATE.chart.canvas || !STATE.chart.canvas.isConnected)) destroyChart();
+
+  const latestTime = dataObj.history[dataObj.history.length - 1].x;
+  const cutoff = STATE.timeRange === '24h' ? latestTime - 86400000 : latestTime - 604800000;
+  const filtered = dataObj.history.filter(pt => pt.x > cutoff);
+
+  const ctx = canvas.getContext('2d');
+  const accent = BIOME_ACCENT[STATE.currentBiome] || '#1B5E9F';
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, accent + '40');
+  gradient.addColorStop(1, accent + '00');
+
+  if (window.Chart) {
+    Chart.defaults.font.family = 'Inter';
+    Chart.defaults.color = '#5A6271';
+  }
+
+  if (STATE.chart) {
+    try {
+      STATE.chart.data.datasets[0].data = filtered;
+      STATE.chart.data.datasets[0].borderColor = accent;
+      STATE.chart.data.datasets[0].backgroundColor = gradient;
+      STATE.chart.update('none');
+      return;
+    } catch (e) {
+      destroyChart();
+    }
+  }
+
+  STATE.chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: sensorCfg.label,
+        data: filtered,
+        borderColor: accent,
+        backgroundColor: gradient,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: accent,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2,
+        tension: 0.35,
+        borderWidth: 1.75
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(0, 46, 93, 0.94)',
+          titleColor: '#FBFAF6',
+          bodyColor: '#FBFAF6',
+          titleFont: { family: 'JetBrains Mono', size: 10, weight: '500' },
+          bodyFont: { family: 'Inter', size: 11, weight: '600' },
+          padding: 10,
+          displayColors: false,
+          borderColor: 'rgba(171,5,32,0.4)',
+          borderWidth: 1,
+          callbacks: {
+            title: (items) => {
+              const d = new Date(items[0].parsed.x);
+              return d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            },
+            label: (ctx) => `${sensorCfg.label}: ${formatValue(ctx.parsed.y)} ${sensorCfg.unit || ''}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'time',
+          grid: { display: false },
+          ticks: { maxTicksLimit: 6, font: { size: 9, family: 'JetBrains Mono' }, color: '#97A0AE' },
+          border: { color: 'rgba(0,46,93,0.10)' }
+        },
+        y: {
+          grid: { color: 'rgba(0,46,93,0.05)' },
+          ticks: { maxTicksLimit: 5, font: { size: 9, family: 'JetBrains Mono' }, color: '#97A0AE' },
+          border: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// ============================================================
+// CAROUSEL
+// ============================================================
+function startCarousel() {
+  stopCarousel();
+  if (!STATE.currentBiome) return;
+  const imgs = BIOMES[STATE.currentBiome].images || [];
+  if (imgs.length < 2) return;
+  STATE.carouselTimer = setInterval(() => {
+    STATE.carouselIndex = (STATE.carouselIndex + 1) % imgs.length;
+    updateCarousel();
+  }, 5000);
+}
+function stopCarousel() {
+  if (STATE.carouselTimer) { clearInterval(STATE.carouselTimer); STATE.carouselTimer = null; }
+}
+function updateCarousel() {
+  const track = document.getElementById('carousel-track');
+  if (!track) return;
+  track.style.transform = `translateX(-${STATE.carouselIndex * 100}%)`;
+  const imgs = STATE.currentBiome ? (BIOMES[STATE.currentBiome].images || []) : [];
+  const dots = document.getElementById('carousel-dots');
+  if (!dots) return;
+  dots.innerHTML = imgs.map((_, i) =>
+    `<button class="carousel-dot ${i === STATE.carouselIndex ? 'active' : ''}" data-i="${i}" aria-label="Slide ${i+1}"></button>`
+  ).join('');
+  dots.querySelectorAll('.carousel-dot').forEach(d => {
+    d.addEventListener('click', () => {
+      STATE.carouselIndex = parseInt(d.dataset.i);
+      updateCarousel();
+    });
+  });
+}
+
+// ============================================================
+// TOGGLES
+// ============================================================
+window.toggleAutoRotate = function() {
+  STATE.autoRotate = !STATE.autoRotate;
+  controls.autoRotate = STATE.autoRotate;
+  document.getElementById('t-orbit').checked = STATE.autoRotate;
+  toast(STATE.autoRotate ? 'Auto-orbit on' : 'Auto-orbit off', 'orbit');
+};
+window.toggleWireframe = function() {
+  STATE.wireframe = !STATE.wireframe;
+  document.getElementById('t-wire').checked = STATE.wireframe;
+  update3DHighlight();
+  toast(STATE.wireframe ? 'Structural grid on' : 'Structural grid off', 'grid-3x3');
+};
+window.toggleStructureCutaway = function() {
+  STATE.cutawayStructure = !STATE.cutawayStructure;
+  document.getElementById('t-cutaway').checked = STATE.cutawayStructure;
+  update3DHighlight();
+  toast(STATE.cutawayStructure ? 'Structure cutaway' : 'Structure visible', 'layers');
+};
+function toggleLabels() {
+  STATE.showLabels = !STATE.showLabels;
+  document.getElementById('t-labels').checked = STATE.showLabels;
+  update3DHighlight();
+  toast(STATE.showLabels ? 'System labels on' : 'System labels off', 'tag');
+}
+
+window.resetView = function() {
+  if (STATE.cameraTween) STATE.cameraTween.cancel = true;
+  const fromTarget = controls.target.clone();
+  const toTarget = new THREE.Vector3(0, 0, 0);
+  const fromPos = camera.position.clone();
+  const toPos = new THREE.Vector3(0, 4200, 8400);
+  tweenCamera(fromTarget, toTarget, fromPos, toPos, 900);
+  clearSelection();
+  toast('Camera reset', 'scan');
+};
+function topView() {
+  if (STATE.cameraTween) STATE.cameraTween.cancel = true;
+  const fromTarget = controls.target.clone();
+  const toTarget = new THREE.Vector3(0, 0, 0);
+  const fromPos = camera.position.clone();
+  const toPos = new THREE.Vector3(0, 12000, 0.01);
+  tweenCamera(fromTarget, toTarget, fromPos, toPos, 900);
+  toast('Top-down view', 'arrow-up');
+}
+
+// ============================================================
+// KEYBOARD ACCESSIBILITY
+// ============================================================
+function bindEscapeToClose() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && STATE.currentBiome) {
+      closePanel();
+    }
+  });
+}
+// ============================================================
+// TOASTS
+// ============================================================
+function toast(msg, icon) {
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<i data-lucide="${icon || 'info'}" class="w-3.5 h-3.5"></i><span>${msg}</span>`;
+  stack.appendChild(el);
+  if (window.lucide) lucide.createIcons();
+  setTimeout(() => { el.classList.add('fade'); setTimeout(() => el.remove(), 300); }, 2200);
+}
+
+// ============================================================
+// ANIMATE — rAF loop with visibility pause
+// ============================================================
+function onResize() {
+  const viewport = getViewportSize();
+  camera.aspect = viewport.width / viewport.height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(viewport.width, viewport.height);
+  // Re-cap pixel ratio on resize (window may have moved to a different DPI screen)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.5 : 2));
+  positionTabUnderline();
+}
+
+let lastFps = performance.now();
+let miniFrames = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  if (STATE.paused) return;
+
+  const now = performance.now();
+  controls.update();
+
+  miniFrames++;
+  if (now - lastFps >= 1000) {
+    STATE.fps = Math.round((miniFrames * 1000) / (now - lastFps));
+    document.getElementById('status-fps').textContent = STATE.fps + ' FPS';
+    miniFrames = 0;
+    lastFps = now;
+  }
+
+  const dist = camera.position.distanceTo(controls.target);
+  const zoom = (8400 / dist).toFixed(2);
+  document.getElementById('status-zoom').textContent = `Z ${zoom}×`;
+
+  if (selectionRing3D && selectionRing3D.visible) {
+    const s = 1 + Math.sin(now * 0.002) * 0.06;
+    selectionRing3D.scale.set(s, s, s);
+    selectionRing3D.material.opacity = 0.35 + Math.sin(now * 0.002) * 0.15;
+  }
+
+  renderer.render(scene, camera);
+}
+
+// Boot
+init();
+setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 200);
+window.addEventListener('resize', () => { if (window.lucide) lucide.createIcons(); positionTabUnderline(); });
+</script>
+
+</body>
+</html>

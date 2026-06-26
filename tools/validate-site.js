@@ -87,29 +87,118 @@ for (const file of htmlFiles) {
   const visibleFilename = html.match(/<figcaption>[^<]*\.(?:jpe?g|png|webp|gif)[^<]*<\/figcaption>|>(?:[^<]*Image_\d[^<]*|[^<]*\.(?:jpe?g|png|webp|gif)[^<]*)<\/(?:p|h2|h3|span|figcaption)>/i);
   if (visibleFilename) errors.push(`${rel(file)} appears to expose a raw image filename as visible text`);
   if (/media\/social\/index\.html$/.test(rel(file))) {
-    if (!/class="social-logo"/.test(html)) errors.push('media/social/index.html is missing constrained social-logo images');
+    if (!/class="[^"]*\bsocial-logo\b/.test(html)) errors.push('media/social/index.html is missing constrained social-logo elements');
     if (/style=["'][^"']*(width|height)\s*:\s*(?:[2-9]\d{2,}|\d{4,})px/i.test(html)) errors.push('media/social/index.html contains oversized inline logo dimensions');
   }
 }
 
 const mustUseImages = {
-  'conference/spaces/index.html': 'CONTENT/CONFERENCECENTER/FACILITIES/IMAGES/',
-  'media/social/index.html': 'CONTENT/MEDIA/SOCIALMEDIA/IMAGES/',
-  'about/leadership/index.html': 'CONTENT/ABOUT/LEADERSHIP/IMAGES/',
-  'research/directory/index.html': 'CONTENT/RESEARCH/RESEARCHDIRECTORY/IMAGES/',
-  'research/data/index.html': 'CONTENT/RESEARCH/NEWSYSTEMSDATA/IMAGES/',
-  'research/leo/index.html': 'CONTENT/RESEARCH/B2ECOSYSTEMS/IMAGES/leo',
-  'research/rainforest/index.html': 'CONTENT/RESEARCH/B2ECOSYSTEMS/IMAGES/B2_rainforest',
-  'research/ocean/index.html': 'CONTENT/RESEARCH/B2ECOSYSTEMS/IMAGES/Ocean',
-  'research/desert/index.html': 'CONTENT/RESEARCH/B2ECOSYSTEMS/IMAGES/desert',
-  'research/mangroves/index.html': 'CONTENT/RESEARCH/B2ECOSYSTEMS/IMAGES/mangroves',
-  'research/savanna/index.html': 'CONTENT/RESEARCH/B2ECOSYSTEMS/IMAGES/Savanna',
+  'conference/spaces/index.html': 'research/images/oracle_biosphere2_1.jpg',
+  'media/social/index.html': 'social-logo',
+  'about/leadership/index.html': 'research/images/oracle_biosphere2_1.jpg',
+  'research/directory/index.html': '../images/oracle_biosphere2_1.jpg',
+  'research/data/index.html': '../images/cooling_towers_1.jpg',
+  'research/leo/index.html': '../images/leo_1.jpg',
+  'research/rainforest/index.html': '../images/rainforest_1.jpg',
+  'research/ocean/index.html': '../images/ocean_2.jpg',
+  'research/desert/index.html': '../images/fog_desert_2.jpg',
+  'research/mangroves/index.html': '../images/mangroves_2.jpg',
+  'research/savanna/index.html': '../images/savannah_2.jpg',
 };
 
 for (const [page, needle] of Object.entries(mustUseImages)) {
   const full = path.join(ROOT, page);
   if (!fs.existsSync(full)) errors.push(`Missing important page ${page}`);
   else if (!fs.readFileSync(full, 'utf8').includes(needle)) errors.push(`${page} does not use expected matching image folder/pattern`);
+}
+
+const peopleImagePages = {
+  'about/leadership/index.html': [
+    'assets/people/john-adams.jpeg.webp',
+    'assets/people/joaquin-ruiz.jpg.webp',
+    'assets/people/aaron-bugaj.jpg',
+    'assets/people/katerina-dontsova.jpg.webp',
+    'assets/people/scott-saleska.jpg.webp',
+    'assets/people/greg-barron-gafford.png.webp',
+    'assets/people/diane-thompson.jpg.webp',
+    'assets/people/joost-van-haren.jpg.webp',
+    'assets/people/kai-staats.jpg.webp',
+    'assets/people/jeff-larsen.jpeg.webp',
+  ],
+  'directory/index.html': [
+    'assets/people/john-adams.jpeg.webp',
+    'assets/people/aaron-bugaj.jpg',
+    'assets/people/katerina-dontsova.jpg.webp',
+    'assets/people/matej-durcik.jpg.webp',
+    'assets/people/wei-ren-ng.jpg.webp',
+    'assets/people/matthew-peterson.jpg',
+    'assets/people/jason-deleeuw.jpg',
+    'assets/people/scott-saleska.jpg.webp',
+    'assets/people/greg-barron-gafford.png.webp',
+    'assets/people/diane-thompson.jpg.webp',
+    'assets/people/joost-van-haren.jpg.webp',
+    'assets/people/kai-staats.jpg.webp',
+    'assets/people/justin-beslity.png',
+    'assets/people/lia-crocker.png.webp',
+    'assets/people/renee-grambihler.jpg.webp',
+    'assets/people/jeff-larsen.jpeg.webp',
+    'assets/people/clement-lopez.jpg',
+  ],
+  'research/directory/index.html': [
+    'assets/people/john-adams.jpeg.webp',
+    'assets/people/aaron-bugaj.jpg',
+    'assets/people/katerina-dontsova.jpg.webp',
+    'assets/people/matej-durcik.jpg.webp',
+    'assets/people/wei-ren-ng.jpg.webp',
+    'assets/people/matthew-peterson.jpg',
+    'assets/people/jason-deleeuw.jpg',
+    'assets/people/scott-saleska.jpg.webp',
+    'assets/people/greg-barron-gafford.png.webp',
+    'assets/people/diane-thompson.jpg.webp',
+    'assets/people/joost-van-haren.jpg.webp',
+    'assets/people/kai-staats.jpg.webp',
+    'assets/people/justin-beslity.png',
+    'assets/people/lia-crocker.png.webp',
+    'assets/people/renee-grambihler.jpg.webp',
+    'assets/people/jeff-larsen.jpeg.webp',
+    'assets/people/clement-lopez.jpg',
+  ],
+  'pages/about/leadership.html': [
+    'assets/people/john-adams.jpeg.webp',
+    'assets/people/joaquin-ruiz.jpg.webp',
+    'assets/people/aaron-bugaj.jpg',
+    'assets/people/katerina-dontsova.jpg.webp',
+    'assets/people/scott-saleska.jpg.webp',
+    'assets/people/greg-barron-gafford.png.webp',
+    'assets/people/diane-thompson.jpg.webp',
+    'assets/people/joost-van-haren.jpg.webp',
+    'assets/people/kai-staats.jpg.webp',
+    'assets/people/jeff-larsen.jpeg.webp',
+  ],
+};
+
+for (const [page, needles] of Object.entries(peopleImagePages)) {
+  const full = path.join(ROOT, page);
+  if (!fs.existsSync(full)) {
+    errors.push(`Missing people-image page ${page}`);
+    continue;
+  }
+  const html = fs.readFileSync(full, 'utf8');
+  for (const needle of needles) {
+    if (!html.includes(needle)) errors.push(`${page} is missing people asset ${needle}`);
+  }
+  const profileCards = html.match(/<article class="[^"]*(?:abt-)?profile-card[\s\S]*?<\/article>/g) || [];
+  for (const card of profileCards) {
+    if (/src=["'][^"']*research\/images\//.test(card)) {
+      errors.push(`${page} uses a research/facility image inside a profile card`);
+    }
+  }
+  const portraitStrips = html.match(/<div class="[^"]*(?:abt-portrait-strip|directory-portrait-strip)[\s\S]*?<\/div>/g) || [];
+  for (const strip of portraitStrips) {
+    if (/src=["'](?![^"']*assets\/people\/)/.test(strip)) {
+      errors.push(`${page} uses a non-people image inside a portrait strip`);
+    }
+  }
 }
 
 const representative = [

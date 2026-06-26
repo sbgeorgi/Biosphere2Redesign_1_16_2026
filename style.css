@@ -84,6 +84,17 @@
     --surface-overlay: rgba(0, 28, 72, 0.92);
     --divider: rgba(0, 28, 72, 0.06);
     --divider-strong: rgba(0, 28, 72, 0.12);
+
+    --section-pad: clamp(4rem, 8vw, 7rem);
+    --container-pad: clamp(1.25rem, 5vw, 5rem);
+    --card-padding: 1.5rem;
+    --card-radius: 16px;
+    --card-hover-lift: -4px;
+    --card-hover-transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-fast: 150ms;
+    --duration-base: 250ms;
+    --duration-smooth: 400ms;
+    --duration-slow: 600ms;
 }
 
 /* ==========================================================================
@@ -123,16 +134,7 @@ body {
     color: var(--ua-white);
 }
 
-:focus-visible {
-    outline: 2px solid var(--ua-oasis);
-    outline-offset: 3px;
-    border-radius: 4px;
-    box-shadow: 0 0 0 6px rgba(55, 141, 189, 0.15);
-}
-a:focus-visible,
-button:focus-visible {
-    outline-offset: 2px;
-}
+/* :focus-visible moved to micro-interactions section */
 
 a {
     text-decoration: none;
@@ -180,7 +182,7 @@ html.b2-interface-booting #global-footer * {
 .section-label {
     display: flex;
     font-family: var(--font-heading);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.18em;
@@ -203,7 +205,7 @@ html.b2-interface-booting #global-footer * {
 .body-text {
     font-family: var(--font-body);
     font-size: 1.125rem;
-    line-height: 1.7;
+    line-height: 1.75;
     color: var(--ua-blue);
     font-weight: 400;
     max-width: 600px;
@@ -285,7 +287,7 @@ html.b2-interface-booting #global-footer * {
     justify-content: space-between;
     padding: 0 var(--spacing-container);
     font-family: var(--font-heading);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     z-index: 1001;
@@ -393,7 +395,7 @@ html.b2-interface-booting #global-footer * {
     background: none;
     border: none;
     font-family: var(--font-heading);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -458,7 +460,7 @@ html.b2-interface-booting #global-footer * {
 
 .mega-col-header {
     font-family: var(--font-heading);
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     color: var(--ua-sky);
     margin-bottom: 1rem;
     letter-spacing: 0.12em;
@@ -485,7 +487,7 @@ html.b2-interface-booting #global-footer * {
 /* Nav Actions */
 .nav-item {
     font-family: var(--font-heading);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -534,7 +536,7 @@ html.b2-interface-booting #global-footer * {
     font-weight: 700;
     text-transform: uppercase;
     white-space: nowrap;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     letter-spacing: 0.06em;
     transition:
         color 0.2s var(--ease-out-expo),
@@ -641,7 +643,7 @@ html.b2-interface-booting #global-footer * {
 
 .hero-status {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--ua-oasis);
     margin-bottom: 1.25rem;
     letter-spacing: 0.12em;
@@ -735,7 +737,7 @@ html.b2-interface-booting #global-footer * {
 
 .stat-lbl {
     font-family: var(--font-heading);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     color: var(--ua-oasis);
     margin-top: 6px;
@@ -783,7 +785,7 @@ html.b2-interface-booting #global-footer * {
 .card-label {
     display: block;
     font-family: var(--font-heading);
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     color: var(--ua-azurite);
     letter-spacing: 0.12em;
     margin-bottom: 0.5rem;
@@ -808,7 +810,7 @@ html.b2-interface-booting #global-footer * {
     z-index: 3;
     color: rgba(255, 255, 255, 0.6);
     font-family: var(--font-heading);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.15em;
@@ -816,6 +818,12 @@ html.b2-interface-booting #global-footer * {
     align-items: center;
     gap: 12px;
     transition: color 0.3s ease;
+    animation: scroll-bounce 2.5s ease-in-out infinite;
+}
+
+@keyframes scroll-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
 }
 
 .hero-scroll-indicator:hover {
@@ -827,7 +835,7 @@ html.b2-interface-booting #global-footer * {
    ========================================================================== */
 .services-3col {
     display: flex;
-    min-height: 600px;
+    min-height: clamp(460px, 42rem, 600px);
     width: 100%;
     background: var(--ua-midnight);
     position: relative;
@@ -857,7 +865,7 @@ html.b2-interface-booting #global-footer * {
     cursor: pointer;
     overflow: hidden;
     border-left: 1px solid rgba(255, 255, 255, 0.06);
-    height: 600px;
+    min-height: clamp(420px, 38rem, 540px);
 }
 
 .service-col::after {
@@ -966,7 +974,7 @@ html.b2-interface-booting #global-footer * {
    ========================================================================== */
 .partners-ticker {
     background: var(--ua-white);
-    padding: 48px 0;
+    padding: clamp(2.25rem, 4vw, 3.75rem) 0;
     overflow: hidden;
     white-space: nowrap;
     border-bottom: 1px solid rgba(0, 28, 72, 0.06);
@@ -997,7 +1005,7 @@ html.b2-interface-booting #global-footer * {
 
 .ticker-track {
     display: flex;
-    gap: 80px;
+    gap: 3rem;
     width: max-content;
     animation: scroll 70s linear infinite;
     backface-visibility: hidden;
@@ -1078,7 +1086,7 @@ html.b2-interface-booting #global-footer * {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 var(--spacing-container);
+    padding: clamp(3rem, 5vw, 5rem) var(--spacing-container);
     background: linear-gradient(160deg, var(--ua-azurite) 0%, var(--ua-oasis) 100%);
     z-index: 5;
     color: var(--ua-white);
@@ -1096,12 +1104,14 @@ html.b2-interface-booting #global-footer * {
 .sticky-content .display-heading {
     color: var(--ua-white);
     position: relative;
+    margin-bottom: 1.35rem;
 }
 
 .sticky-content .body-text {
     color: rgba(255, 255, 255, 0.85);
     font-weight: 500;
     position: relative;
+    max-width: 68ch;
 }
 
 .sticky-content .section-label {
@@ -1115,11 +1125,11 @@ html.b2-interface-booting #global-footer * {
 
 .scrolling-visuals {
     flex: 1.2;
-    padding-top: 15vh;
-    padding-bottom: 15vh;
+    padding-top: clamp(3.5rem, 8vh, 6rem);
+    padding-bottom: clamp(4rem, 8vh, 6.5rem);
     display: flex;
     flex-direction: column;
-    gap: 20vh;
+    gap: clamp(3rem, 7vh, 5rem);
     padding-left: var(--spacing-container);
     padding-right: var(--spacing-container);
     background-color: var(--ua-white);
@@ -1129,12 +1139,16 @@ html.b2-interface-booting #global-footer * {
 .visual-item {
     position: relative;
     width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
     display: block;
     cursor: pointer;
 }
 
 .img-frame {
     width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: min(52vh, 560px);
     border: none;
     border-radius: var(--radius-sm);
     box-shadow:
@@ -1148,6 +1162,8 @@ html.b2-interface-booting #global-footer * {
 }
 
 .img-frame img {
+    height: 100%;
+    object-fit: cover;
     opacity: 0.92;
     transition:
         opacity 0.25s var(--ease-out-expo),
@@ -1168,18 +1184,18 @@ html.b2-interface-booting #global-footer * {
 
 .tech-spec {
     position: absolute;
-    bottom: -1.5rem;
-    right: -1rem;
+    bottom: -1.1rem;
+    right: -0.75rem;
     background: var(--ua-midnight);
     color: var(--ua-white);
-    padding: 1rem 1.25rem;
+    padding: 0.85rem 1rem;
     display: flex;
     flex-direction: column;
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     border: 1px solid rgba(129, 211, 235, 0.2);
     border-radius: var(--radius-sm);
-    min-width: 180px;
+    min-width: 168px;
     transition:
         background-color 0.2s var(--ease-out-expo),
         border-color 0.2s var(--ease-out-expo),
@@ -1199,7 +1215,7 @@ html.b2-interface-booting #global-footer * {
 .tech-spec span:first-child {
     color: var(--ua-sky);
     font-weight: 700;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     margin-bottom: 4px;
 }
 
@@ -1237,7 +1253,7 @@ html.b2-interface-booting #global-footer * {
    7. LIVE SYSTEM INTELLIGENCE
    ========================================================================== */
 .section-padding {
-    padding: 6rem 0;
+    padding: var(--section-pad) 0;
     position: relative;
 }
 
@@ -1247,6 +1263,7 @@ html.b2-interface-booting #global-footer * {
 
 #systems {
     scroll-margin-top: 150px;
+    padding: clamp(2.5rem, 4vw, 3.75rem) 0;
 }
 
 .bg-light-theme {
@@ -1267,16 +1284,21 @@ html.b2-interface-booting #global-footer * {
 .integrated-container {
     padding: 0 var(--spacing-container);
     width: 100%;
+    max-width: 1520px;
     margin: 0 auto;
 }
 
 .dashboard-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 30px;
+    align-items: center;
+    margin-bottom: 1.15rem;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 1rem;
+}
+
+.dashboard-header .display-heading {
+    margin-bottom: 0;
 }
 
 .system-tabs {
@@ -1292,11 +1314,11 @@ html.b2-interface-booting #global-footer * {
 .tab-btn {
     border: none;
     background: transparent;
-    padding: 10px 22px;
+    padding: 9px 18px;
     border-radius: var(--radius-pill);
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--ua-blue);
     cursor: pointer;
     transition:
@@ -1325,10 +1347,10 @@ html.b2-interface-booting #global-footer * {
         linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(238, 247, 250, 0.94));
     border-radius: var(--radius-card);
     box-shadow: 0 26px 80px rgba(0, 28, 72, 0.14), 0 8px 24px rgba(0, 28, 72, 0.06);
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
     overflow: hidden;
-    min-height: 600px;
+    min-height: auto;
     width: 100%;
     border: 1px solid rgba(0, 28, 72, 0.08);
 }
@@ -1336,9 +1358,7 @@ html.b2-interface-booting #global-footer * {
 .dashboard-visual {
     position: relative;
     background: var(--ua-cool-gray);
-    width: 25%;
-    min-width: 250px;
-    flex-shrink: 0;
+    min-width: 0;
     overflow: hidden;
 }
 
@@ -1362,18 +1382,18 @@ html.b2-interface-booting #global-footer * {
 
 /* --- DATA LAYOUT --- */
 .dashboard-data {
-    padding: 44px;
+    padding: clamp(1.15rem, 2vw, 1.85rem);
     position: relative;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    width: 75%;
+    width: 100%;
 }
 
 .data-header {
     border-bottom: 1px solid rgba(0, 28, 72, 0.06);
-    padding-bottom: 20px;
-    margin-bottom: 30px;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.95rem;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -1384,7 +1404,7 @@ html.b2-interface-booting #global-footer * {
 .data-header h3 {
     font-family: var(--font-serif);
     font-weight: 700;
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(1.85rem, 2.6vw, 2.45rem);
     color: var(--ua-midnight);
     margin: 0;
     letter-spacing: 0;
@@ -1400,60 +1420,60 @@ html.b2-interface-booting #global-footer * {
 }
 
 .data-content-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(260px, 0.72fr) minmax(430px, 1fr);
+    gap: clamp(1rem, 1.8vw, 1.45rem);
+    align-items: stretch;
+    height: auto;
 }
 
 .data-left-col {
-    flex: 1 1 300px;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .data-right-col {
-    flex: 1 1 400px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 0.85rem;
     min-width: 0;
 }
 
 #system-blurb {
     font-family: var(--font-body);
     color: var(--ua-blue);
-    margin-bottom: 30px;
-    font-size: 1rem;
-    line-height: 1.75;
+    margin-bottom: 0.85rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
 }
 
 .finding-box {
     border-left: 3px solid var(--ua-oasis);
-    padding: 20px 24px;
-    margin-bottom: 40px;
-    font-size: 1rem;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.95rem;
     font-style: italic;
     font-family: var(--font-serif);
     color: var(--ua-midnight);
     background: linear-gradient(135deg, rgba(129, 211, 235, 0.06) 0%, rgba(55, 141, 189, 0.04) 100%);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    line-height: 1.7;
+    line-height: 1.58;
 }
 
 /* Metrics Grid */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(4, minmax(96px, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 0;
 }
 
 .metric-card {
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 249, 0.9));
     border-radius: var(--radius-md);
-    padding: 16px 12px;
+    padding: 0.8rem 0.7rem;
     cursor: pointer;
     border: 1px solid rgba(0, 28, 72, 0.07);
     transition:
@@ -1506,7 +1526,7 @@ html.b2-interface-booting #global-footer * {
     color: var(--ua-azurite);
     font-weight: 800;
     letter-spacing: 0.06em;
-    margin-bottom: 6px;
+    margin-bottom: 0.35rem;
 }
 
 .m-val {
@@ -1530,15 +1550,15 @@ html.b2-interface-booting #global-footer * {
 
 /* Chart Area */
 .chart-container {
-    flex-grow: 1;
+    flex: 0 0 auto;
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 253, 0.92)),
         var(--ua-warm-gray);
     border-radius: var(--radius-md);
-    padding: 24px;
+    padding: 0.9rem;
     display: flex;
     flex-direction: column;
-    min-height: 360px;
+    min-height: 235px;
     width: 100%;
     position: relative;
     border: 1px solid rgba(0, 28, 72, 0.08);
@@ -1549,8 +1569,8 @@ html.b2-interface-booting #global-footer * {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    font-size: 0.78rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
     color: var(--ua-blue);
     text-transform: uppercase;
     font-weight: 700;
@@ -1595,19 +1615,19 @@ html.b2-interface-booting #global-footer * {
 
 .chart-canvas-wrapper {
     position: relative;
-    min-height: 300px;
-    height: 100%;
+    min-height: 178px;
+    height: 190px;
     width: 100%;
     flex-grow: 1;
 }
 
 .chart-canvas-wrapper canvas {
-    min-height: 300px;
+    min-height: 178px;
 }
 
 .dashboard-footer {
     margin-top: auto;
-    padding-top: 24px;
+    padding-top: 0.75rem;
 }
 
 .btn-secondary-circle {
@@ -1650,14 +1670,14 @@ html.b2-interface-booting #global-footer * {
 
 /* Events */
 .events-section {
-    padding: 6rem 0;
+    padding: var(--section-pad) 0;
     border-bottom: 1px solid rgba(0, 28, 72, 0.06);
 }
 
 .events-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 5rem;
+    gap: 3rem;
     align-items: center;
 }
 
@@ -1778,7 +1798,7 @@ html.b2-interface-booting #global-footer * {
 
 /* Expertise/Skills */
 .skills-section {
-    padding: 6rem 0;
+    padding: var(--section-pad) 0;
     background: linear-gradient(170deg, var(--ua-midnight) 0%, #00122f 100%);
     color: white;
     position: relative;
@@ -1801,7 +1821,7 @@ html.b2-interface-booting #global-footer * {
     flex-wrap: wrap;
     justify-content: center;
     gap: 6px;
-    margin: 40px 0;
+    margin: 2rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -1835,7 +1855,7 @@ html.b2-interface-booting #global-footer * {
 .skills-split-layout {
     display: flex;
     flex-direction: row;
-    gap: 4rem;
+    gap: 2.5rem;
     margin-top: 3rem;
     align-items: center;
 }
@@ -1884,7 +1904,7 @@ html.b2-interface-booting #global-footer * {
 .meta-label {
     font-family: var(--font-heading);
     color: var(--ua-sky);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     font-weight: 700;
@@ -1898,14 +1918,14 @@ html.b2-interface-booting #global-footer * {
 }
 
 .skill-row {
-    margin-bottom: 28px;
+    margin-bottom: 1.25rem;
 }
 
 .skill-name {
     display: block;
     margin-bottom: 10px;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-family: var(--font-heading);
     color: rgba(232, 237, 240, 0.6);
     text-transform: uppercase;
@@ -1925,7 +1945,7 @@ html.b2-interface-booting #global-footer * {
     background: linear-gradient(90deg, var(--ua-river), var(--ua-oasis), var(--ua-sky));
     transform: scaleX(var(--progress, 1));
     transform-origin: left center;
-    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 1s var(--ease-out-expo);
     border-radius: 99px;
     position: relative;
     will-change: transform;
@@ -1966,11 +1986,11 @@ html.b2-interface-booting #global-footer * {
 }
 
 .slider-card {
-    min-width: 340px;
-    max-width: 340px;
+    min-width: 320px;
+    max-width: 360px;
     background: white;
-    border-radius: var(--radius-lg);
-    padding: 28px;
+    border-radius: var(--card-radius);
+    padding: var(--card-padding);
     transition:
         border-color 0.3s var(--ease-out-expo),
         box-shadow 0.3s var(--ease-out-expo),
@@ -1995,7 +2015,7 @@ html.b2-interface-booting #global-footer * {
 }
 
 .slider-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(var(--card-hover-lift));
     box-shadow: var(--shadow-lg);
     border-color: transparent;
 }
@@ -2005,7 +2025,7 @@ html.b2-interface-booting #global-footer * {
 }
 
 .card-logo {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 1.5px;
     color: var(--ua-azurite);
@@ -2040,7 +2060,7 @@ html.b2-interface-booting #global-footer * {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 44px;
+    margin-top: 2rem;
 }
 
 .dot {
@@ -2070,7 +2090,7 @@ html.b2-interface-booting #global-footer * {
 
 .find-us-grid {
     display: flex;
-    height: 500px;
+    min-height: 480px;
 }
 
 .find-us-map {
@@ -2080,7 +2100,7 @@ html.b2-interface-booting #global-footer * {
 
 .find-us-info {
     flex: 1;
-    padding: 60px;
+    padding: clamp(2rem, 4vw, 3.5rem);
     background: var(--ua-warm-gray);
     display: flex;
     flex-direction: column;
@@ -2107,8 +2127,8 @@ html.b2-interface-booting #global-footer * {
 .location-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 40px;
-    margin-bottom: 40px;
+    gap: 2rem;
+    margin-bottom: 2rem;
     font-family: var(--font-body);
     font-size: 1rem;
     color: var(--ua-blue);
@@ -2188,9 +2208,9 @@ html.b2-interface-booting #global-footer * {
 .main-footer {
     background-color: var(--ua-white);
     color: var(--ua-blue);
-    padding: 5rem var(--spacing-container) 1.5rem;
+    padding: var(--section-pad) var(--spacing-container) 1.5rem;
     font-family: var(--font-body);
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     border-top: 1px solid rgba(0, 28, 72, 0.06);
     position: relative;
 }
@@ -2208,7 +2228,7 @@ html.b2-interface-booting #global-footer * {
 .footer-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 3rem;
+    gap: var(--space-5, 3rem);
     margin-bottom: 4rem;
 }
 
@@ -2218,7 +2238,7 @@ html.b2-interface-booting #global-footer * {
     font-family: var(--font-heading);
     font-weight: 800;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     letter-spacing: 0.08em;
 }
 
@@ -2297,8 +2317,169 @@ html.b2-interface-booting #global-footer * {
     gap: 12px;
     justify-content: space-between;
     color: rgba(0, 28, 72, 0.4);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
 }
+
+
+
+/* --- Enhanced Micro-Interactions --- */
+
+/* Research column accent bar on hover */
+.col-content::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--ua-sky), var(--ua-oasis));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-out-expo);
+}
+.service-col:hover .col-content::after {
+    transform: scaleX(1);
+}
+
+/* Story card image zoom on hover */
+.slider-card img {
+    transition: transform 0.5s var(--ease-out-expo);
+}
+.slider-card:hover img {
+    transform: scale(1.04);
+}
+
+/* Nav link hover underline */
+.nav-links a {
+    position: relative;
+}
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--ua-sky);
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s var(--ease-out-expo);
+}
+.nav-links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Dashboard tab enhanced hover */
+.tab-btn {
+    position: relative;
+}
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--ua-red);
+    border-radius: 1px;
+    transform: scaleX(0);
+    transition: transform 0.3s var(--ease-out-expo);
+}
+.tab-btn:not(.active):hover::after {
+    transform: scaleX(0.5);
+    background: rgba(171, 5, 32, 0.3);
+}
+
+/* Metric card enhanced hover */
+.metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Partner logo enhanced hover */
+.partner-item img:hover {
+    opacity: 1;
+    filter: grayscale(0) brightness(1.1);
+    transform: scale(1.08);
+    transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s var(--ease-out-expo);
+}
+
+/* Capability bar shimmer */
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: bar-shimmer 2.5s ease-in-out infinite;
+}
+@keyframes bar-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Hero ambient glow */
+.hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 120%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(55, 141, 189, 0.06) 0%, transparent 70%);
+    z-index: 1;
+    animation: hero-ambient-glow 8s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes hero-ambient-glow {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(5%); }
+}
+
+/* Event item enhanced hover */
+.event-item:hover {
+    border-color: rgba(129, 211, 235, 0.2);
+    transform: translateX(6px);
+}
+
+/* Footer link enhanced hover */
+.footer-col a:hover {
+    color: var(--ua-sky);
+    padding-left: 4px;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--ua-sky);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .ticker-track { animation: none !important; }
+    .reveal, .reveal-left, .reveal-right, .reveal-scale { opacity: 1 !important; transform: none !important; }
+}
+
+/* ==========================================================================
+   GRADIENT TRANSITION DIVIDERS
+   ========================================================================== */
+.b2-gradient-dark-navy { height: clamp(2rem, 4vw, 3.5rem); background: linear-gradient(to bottom, var(--ua-midnight), var(--ua-blue)); }
+.b2-gradient-navy-dark { height: clamp(2rem, 4vw, 3.5rem); background: linear-gradient(to bottom, var(--ua-blue), var(--ua-midnight)); }
+.b2-gradient-navy-light { height: clamp(2rem, 4vw, 3.5rem); background: linear-gradient(to bottom, var(--ua-blue), var(--ua-warm-gray)); }
+.b2-gradient-light-navy { height: clamp(2rem, 4vw, 3.5rem); background: linear-gradient(to bottom, var(--ua-warm-gray), var(--ua-blue)); }
+.b2-gradient-light-dark { height: clamp(2rem, 4vw, 3.5rem); background: linear-gradient(to bottom, var(--ua-warm-gray), var(--ua-midnight)); }
+.b2-gradient-dark-light { height: clamp(2rem, 4vw, 3.5rem); background: linear-gradient(to bottom, var(--ua-midnight), var(--ua-warm-gray)); }
 
 /* ==========================================================================
    10. RESPONSIVE MEDIA QUERIES
@@ -2307,18 +2488,22 @@ html.b2-interface-booting #global-footer * {
 /* --- LARGE LAPTOPS / SMALL DESKTOPS (1200px and below) --- */
 @media (max-width: 1200px) {
     .dashboard-card {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         min-height: auto;
     }
 
     .dashboard-visual {
         width: 100%;
-        height: 250px;
+        height: clamp(220px, 32vw, 320px);
     }
 
     .dashboard-data {
         width: 100%;
         padding: 30px;
+    }
+
+    .data-content-wrapper {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .hero-cards-container {
@@ -2426,7 +2611,7 @@ html.b2-interface-booting #global-footer * {
     }
 
     .service-col {
-        height: 400px;
+        min-height: 400px;
         flex: auto;
     }
 
@@ -2509,8 +2694,8 @@ html.b2-interface-booting #global-footer * {
     }
 
     .data-content-wrapper {
-        flex-direction: column;
-        gap: 30px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
     }
 
     .data-left-col,
@@ -2525,6 +2710,11 @@ html.b2-interface-booting #global-footer * {
 
     .chart-container {
         min-height: 250px;
+    }
+
+    .chart-canvas-wrapper {
+        height: 210px;
+        min-height: 200px;
     }
 
     .events-grid {
@@ -2557,7 +2747,7 @@ html.b2-interface-booting #global-footer * {
     .cal-table th,
     .cal-table td {
         padding: 10px 3px;
-        font-size: 0.82rem;
+        font-size: 0.75rem;
     }
 
     .cal-header {
@@ -2642,7 +2832,7 @@ html.b2-interface-booting #global-footer * {
     }
 
     .service-col {
-        height: 320px;
+        min-height: 320px;
     }
 
     .col-title {
@@ -2669,7 +2859,7 @@ html.b2-interface-booting #global-footer * {
 
     .skill-tab-btn {
         padding: 12px 16px;
-        font-size: 0.82rem;
+        font-size: 0.75rem;
     }
 
     .progress-bar::after {
@@ -2679,7 +2869,7 @@ html.b2-interface-booting #global-footer * {
 
     .ghost-btn-dark {
         padding: 11px 22px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
 
     .tech-spec {
@@ -2687,11 +2877,11 @@ html.b2-interface-booting #global-footer * {
         right: -0.5rem;
         min-width: 150px;
         padding: 0.75rem 1rem;
-        font-size: 0.65rem;
+        font-size: 0.68rem;
     }
 
     .hero-scroll-indicator {
-        font-size: 0.65rem;
+        font-size: 0.68rem;
         bottom: 1.5rem;
     }
 
@@ -2786,7 +2976,7 @@ html.b2-interface-booting #global-footer * {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0;
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     margin-bottom: 1rem;
 }
 
@@ -3061,7 +3251,7 @@ html.b2-interface-booting #global-footer * {
 .profile-card:hover,
 .link-card:hover,
 .publication-card:hover {
-    transform: translateY(-6px);
+    transform: translateY(var(--card-hover-lift));
     box-shadow: 0 24px 60px rgba(0, 28, 72, 0.14), 0 8px 20px rgba(0, 28, 72, 0.06);
     border-color: rgba(55, 141, 189, 0.2);
 }
@@ -3182,7 +3372,7 @@ html.b2-interface-booting #global-footer * {
     display: block;
     margin-top: 0.35rem;
     color: rgba(255, 255, 255, 0.76);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
 }
@@ -3228,7 +3418,7 @@ html.b2-interface-booting #global-footer * {
 .profile-card img + .profile-card-body > p:first-of-type {
     min-height: 3.2rem;
     color: #5e6b78;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.05em;
     line-height: 1.45;
@@ -3451,7 +3641,7 @@ html.b2-interface-booting #global-footer * {
     color: var(--ua-azurite);
     border: 1px solid rgba(55, 141, 189, 0.2);
     font-family: var(--font-heading);
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
 }
@@ -3519,7 +3709,7 @@ html.b2-interface-booting #global-footer * {
 .cta-visual figcaption {
     padding: 0.65rem 0.8rem;
     color: rgba(255, 255, 255, 0.78);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
 }
 
@@ -3553,7 +3743,7 @@ html.b2-interface-booting #global-footer * {
     background: var(--ua-red);
     color: var(--ua-white);
     font-family: var(--font-heading);
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0;
@@ -3569,7 +3759,7 @@ html.b2-interface-booting #global-footer * {
     padding: 0.85rem 1.2rem;
     border-radius: var(--radius-sm);
     font-family: var(--font-heading);
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0;
@@ -3644,7 +3834,7 @@ html.b2-interface-booting #global-footer * {
     gap: 0.45rem;
     color: var(--ua-midnight);
     font-family: var(--font-heading);
-    font-size: 0.76rem;
+    font-size: 0.75rem;
     font-weight: 900;
     text-transform: uppercase;
 }
@@ -3680,7 +3870,7 @@ html.b2-interface-booting #global-footer * {
     background: rgba(55, 141, 189, 0.08);
     color: var(--ua-azurite);
     font-family: var(--font-heading);
-    font-size: 0.76rem;
+    font-size: 0.75rem;
     font-weight: 900;
     text-transform: uppercase;
     cursor: pointer;
@@ -3750,6 +3940,17 @@ img.logo-contain {
     max-height: 80px;
     object-fit: contain;
     mix-blend-mode: multiply;
+}
+
+.logo-card.logo-text {
+    min-height: 112px;
+    color: var(--ua-midnight);
+    font-family: var(--font-heading);
+    font-size: clamp(1.1rem, 2vw, 1.55rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .logo-wordmark {
@@ -3849,7 +4050,7 @@ img.logo-contain {
 .radio-grid legend {
     color: var(--ua-midnight);
     font-family: var(--font-heading);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 900;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -3941,7 +4142,7 @@ img.logo-contain {
     background: rgba(55, 141, 189, 0.12);
     border: 1px solid rgba(55, 141, 189, 0.2) !important;
     font-family: var(--font-heading);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
 }
 
@@ -3958,7 +4159,7 @@ img.logo-contain {
 }
 
 .media-card:hover {
-    transform: translateY(-6px);
+    transform: translateY(var(--card-hover-lift));
     box-shadow: 0 24px 60px rgba(0, 28, 72, 0.14), 0 8px 20px rgba(0, 28, 72, 0.06);
     border-color: rgba(55, 141, 189, 0.2);
 }
@@ -3975,7 +4176,7 @@ img.logo-contain {
     display: inline-flex;
     color: var(--ua-red);
     font-family: var(--font-heading);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 900;
     text-transform: uppercase;
 }
@@ -4096,12 +4297,17 @@ img.logo-contain {
 .social-logo {
     width: 40px;
     height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     object-fit: contain;
     box-sizing: content-box;
     padding: 10px;
     border-radius: 16px;
     background: rgba(244, 247, 249, 0.96);
     box-shadow: inset 0 0 0 1px rgba(0, 28, 72, 0.06);
+    color: var(--ua-azurite);
+    font-size: 1.55rem;
 }
 
 .visit-action-grid {
@@ -4273,31 +4479,4 @@ img.logo-contain {
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 0.001ms !important;
-    }
-
-    .ticker-track {
-        animation: none !important;
-        transform: translate3d(0, 0, 0) !important;
-    }
-
-    .reveal,
-    .reveal-left,
-    .reveal-right,
-    .reveal-scale {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-    }
-}
+/* prefers-reduced-motion moved to micro-interactions section */
